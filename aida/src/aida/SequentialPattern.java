@@ -18,15 +18,11 @@ public class SequentialPattern {
 	//It contains the id of the query
 	private List<Integer> node;
 	//It contains the middle value of the duration of each edge
-	private List<Long> edgeDuration;
-	//It contains the values of the duration of the edges in each istances of the sequential pattern in the input log
-	//Position 1 refers to edge 1 and the values are the list of duration of each instance of edge 1 found in the input log
-	private List<List<Long>> edgeInstancesDuration;
+	private List<Edge> edge;
 	
 	public SequentialPattern() throws InvalidSequentialPatternException{
 		node = new ArrayList<Integer>();
-		edgeDuration = new ArrayList<Long>();
-		edgeInstancesDuration = new ArrayList<List<Long>>();
+		edge = new ArrayList<Edge>();
 		validateState();
 	}
 	
@@ -39,24 +35,16 @@ public class SequentialPattern {
 	}
 	
 	public int getNumberOfEdges(){
-		return edgeDuration.size();
-	}
-	
-	public int getNumberofInstanceEdges(){
-		return edgeInstancesDuration.size();
+		return edge.size();
 	}
 	
 	public void addNode(int n) throws InvalidSequentialPatternException{
 		node.add(n);
 		if(node.size()>=2){
-			edgeDuration.add(null);
-			edgeInstancesDuration.add(new ArrayList<Long>());
+			edge.add(new Edge());
+			validateState();
 		}
-		validateState();
-	}
-	
-	public void addDuration(long duration, int pos){
-		edgeDuration.set(pos, duration);
+
 	}
 	
 	public int getNode(int n){
@@ -64,7 +52,7 @@ public class SequentialPattern {
 	}
 	
 	public long getDuration(int e){
-		return edgeDuration.get(e);
+		return edge.get(e).getDuration();
 	}
 	
 	/**
@@ -90,7 +78,7 @@ public class SequentialPattern {
 				if(end!=null) {
 					diff=end.getTime()-start.getTime();
 					diff=diff/1000;	//Convert in seconds
-					edgeInstancesDuration.get(k-1).add(diff);
+					edge.get(k-1).addInstance(diff);
 					added++;
 					//k and i are decremented because the query that has closed an edge will be the same that will open the next one
 					k--;
@@ -107,37 +95,25 @@ public class SequentialPattern {
 		if(k<node.size()-1){
 			//It removes the duration of the incomplete sp
 			for(int j=0; j<added; j++){
-				edgeInstancesDuration.get(j).remove(edgeInstancesDuration.get(j).size()-1);
+				edge.get(j).removeLastInstance();
 			}
 		}
 
 		validateState();
 	}
 	
-	/**
-	 *  This function computes the middle of the duration for each edge in edgeInstanceDuration and saves it in the corresponding
-	 *  place in edgeDuration.
-	 */
 	public void computeDuration(){
-		long middle;
-		if(edgeDuration.size()>0 && edgeInstancesDuration.get(0).size()>0){
-			for(int i=0; i<edgeInstancesDuration.size();i++){
-				middle=0;
-				for(int j=0; j<edgeInstancesDuration.get(i).size(); j++){
-					middle=middle+edgeInstancesDuration.get(i).get(j);
-				}
-				middle=middle/edgeInstancesDuration.get(i).size();
-				edgeDuration.set(i, middle);
-			}
+		for(int i=0; i<edge.size(); i++){
+			edge.get(i).computeDurationAndVariance();
 		}
 	}
 	
 	private void validateState() throws InvalidSequentialPatternException {
-		if(edgeDuration.size() != node.size()-1 && node.size()>=2)	throw new InvalidSequentialPatternException("Invalid edgeDuration");
+		if(edge.size() != node.size()-1 && node.size()>=2)	throw new InvalidSequentialPatternException("Invalid edge");
 		
 		//TUTTE LE LISTE PER OGNI ISTANZA DEVONO ESSERE LUNGHE UGUALI
-		for(int i=0; i<edgeInstancesDuration.size()-1;i++){
-			if(edgeInstancesDuration.get(i).size()!=edgeInstancesDuration.get(i+1).size())	throw new InvalidSequentialPatternException("Invalid edgeInstancesDuration");
+		for(int i=0; i<edge.size()-2;i++){
+			if(edge.get(i).getNumberOfInstances()!=edge.get(i+1).getNumberOfInstances())	throw new InvalidSequentialPatternException("Invalid edgeInstancesDuration");
 		}
 	}
 	
@@ -145,9 +121,9 @@ public class SequentialPattern {
 		String s = node.get(0).toString();
 			if(node.size()>1){
 				for(int i=1; i<node.size()-1; i++){
-					s=s+" |"+edgeDuration.get(i-1)+"| "+node.get(i);
+					s=s+" |"+edge.get(i-1).getDuration()+"| "+node.get(i);
 				}
-				s=s+" |"+edgeDuration.get(edgeDuration.size()-1)+"| "+node.get(node.size()-1);
+				s=s+" |"+edge.get(edge.size()-1).getDuration()+"| "+node.get(node.size()-1);
 			}
 		return s;
 	}
