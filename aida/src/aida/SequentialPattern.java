@@ -2,13 +2,13 @@ package aida;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import exception.InvalidSequentialPatternException;
 
 /**
+ * This class is the object that stands for a sequential pattern. It has a list of node (element of the sequential pattern) and a
+ * list of edges (the object between nodes).
  * 
  * @author Matteo 796384
  *

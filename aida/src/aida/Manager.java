@@ -1,5 +1,4 @@
 package aida;
-import prefixspan.MainTestPrefixSpan_saveToFile;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -14,12 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import exception.InvalidSequentialPatternException;
+
 /**
- * This class read a CSV file and create a TXT file with a predefined structure.
- * In the TXT file there is not reported the text query, but at each type of query is associated an ID used in the TXT file
- * and there is a Map that keeps the association between query and ID.
- * 
- * The value "-2" indicates the end of a sequence (it appears at the end of each line) and "-1" indicates the end of an itemset.
+ * This class is responsible of managing files, conversion beetween queries and their ID, managing Sequential Pattern and so on..
  *  
  * Moreover this class keeps an Arraylist of the query and an ArrayList of the timestamp. (At position 32 of timestampList there is
  * the timestamp of the query at the position 32 in the queryList.)
@@ -31,10 +28,10 @@ import java.util.Map;
  *
  */
  
-public class ReadCSVtoTXT {
+public class Manager {
 	
 	//Keeps the association between the text of the query and its ID
-	Map<String, Integer> association;
+	static Map<String, Integer> association;
 	//Keeps the entire list (with duplicate) of identifiers of queries in the log
 	ArrayList<Integer> queryList;
 	Map<Integer, List<Integer>> queryMap;
@@ -44,24 +41,27 @@ public class ReadCSVtoTXT {
 	//Constant that indicates the position of the query in a row of the log
 	static final int QUERYPOS = 1;
 	//Constant that indicates the position of the timestamp of the current query in a row of the log
-	static final int TSPOS = 2;
+	static final int TSPOS = 2;	  
+	int idTE = -1; //Initialized to an invalid value
 	 
-	  public static void main(String[] args) throws Exception {
-	 
-		ReadCSVtoTXT obj = new ReadCSVtoTXT();
-		obj.parseCSVtoTXT("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\log_new.csv",
-				"C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan.txt",
-				"SELECT * FROM sensors");	 
-	  }
-	  
-	 
+	/**
+	 * This method reads a CSV file and create a TXT file with a predefined structure.
+	 * In the TXT file there is not reported the text query, but at each type of query is associated an ID used in the TXT file
+	 * and there is a Map that keeps the association between query and ID.
+	 * 
+	 * The value "-2" indicates the end of a sequence (it appears at the end of each line) and "-1" indicates the end of an itemset.
+	 * 
+	 * @param csvPath
+	 * @param outputPath
+	 * @param teQuery
+	 * @throws Exception
+	 */
 	  public void parseCSVtoTXT(String csvPath, String outputPath, String teQuery) throws Exception {
 	 
 		//Three parameter of the tool (input file, output file, query time-expensive
 		String csvFile = csvPath;
 		FileOutputStream output = new FileOutputStream(outputPath);
 		String TEquery = teQuery;
-		int idTE = -1; //Initialized to an invalid value
 		//----
 		BufferedReader br = null;
 		String line = "";
@@ -103,7 +103,6 @@ public class ReadCSVtoTXT {
 					idTE = key;
 				}
 
-				//Timestamp ts = Timestamp.valueOf(token[TSPOS]);
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				Date ts = dateFormat.parse(token[TSPOS]);
 				//Add the query to the list
@@ -153,43 +152,92 @@ public class ReadCSVtoTXT {
 		for(int q: queryList)	System.out.println(q);
 		System.out.println("\n\n----- FOR TESTING PURPOSES -----\n\n");
 		
-		
-		// Launching PrefixSpan Algorithm..
-		System.out.println("Launching PrefixSpan Algorithm..\n");
-		String[] args = new String[2];
-		args[0]=outputPath;
-		args[1]="C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan.txt";
-		MainTestPrefixSpan_saveToFile.main(args);
-		System.out.println("Sequential pattern search done.\n");
-		
-		/* Now I have to parse outputPrefixSpan.txt in order to retrieve the frequent sequential patter that I need (the ones that
-		contains the time-expensive query) and use them in order to calculate the "duration" of a pattern.. */
-		ReadSP spReader = new ReadSP();
-
-		List<SequentialPattern> sp = spReader.parseSP("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan.txt",idTE);
-		
-		for(int i=0; i<sp.size(); i++){
-			for(int j=0; j<queryMap.size();j++){
-				sp.get(i).findSequentialPattern(queryMap.get(j), timestampMap.get(j));
-			}
-			sp.get(i).computeDuration();
-		}
-		
-		/* DEBUG for testing purposes */
-		System.out.println("\n\n----- FOR TESTING PURPOSES -----\n\n");
-		for(int j=0;j<sp.size();j++){
-			SequentialPattern dbg = new SequentialPattern();
-			dbg=sp.get(j);
-			System.out.println(dbg.toString());
-		}
-		System.out.println("\n\n----- FOR TESTING PURPOSES -----\n\n");
-		
-		// "Duration" computation
-
-//		for(int k: dbg){
-//		System.out.print(k+" ");
-//	}
-//	System.out.print("\n");
 	  }
 	  
+	  /**
+	   * This method considers one-at-time each sequential pattern and gives him all the chunck of the log in order to search
+	   * if the sp is in the log and sets the correct values of its edges.
+	   * 
+	   * @param sp The list of sp
+	   * @throws InvalidSequentialPatternException
+	   */
+	  public void findSP(List<SequentialPattern> sp) throws InvalidSequentialPatternException{
+		  for(int i=0; i<sp.size(); i++){
+				for(int j=0; j<queryMap.size();j++){
+					sp.get(i).findSequentialPattern(queryMap.get(j), timestampMap.get(j));
+				}
+				sp.get(i).computeDuration();
+			}
+			
+			/* DEBUG for testing purposes */
+			System.out.println("\n\n----- FOR TESTING PURPOSES -----\n\n");
+			for(int j=0;j<sp.size();j++){
+				SequentialPattern dbg = new SequentialPattern();
+				dbg=sp.get(j);
+				System.out.println(dbg.toString());
+			}
+			System.out.println("\n\n----- FOR TESTING PURPOSES -----\n\n");
+			
+	  }
+	  
+	  /**
+	   * This method parses the txt output file of the sequential pattern mining algorithm and creates an instance of a 
+	   * sequential pattern for each sp found by the algorithm itself
+	   *  
+	   * @param spPath The output file of the algorithm
+	   * @return The list of sequential pattern objects
+	   * @throws Exception
+	   */
+	  public List<SequentialPattern> parseSP(String spPath) throws Exception {
+			
+		//Map with incremental integer as a key and sequential pattern that contains the time-expensive query as value
+		//Map<Integer, List<Integer>> sp = new HashMap<Integer, List<Integer>>();
+		List<SequentialPattern> spList = new ArrayList<SequentialPattern>();
+	 
+		int i=0;
+		BufferedReader br = null;
+		String line = "";
+		String splitBy = " -1 ";
+
+        System.out.println("Starting Sequential Pattern parsing..");
+        
+		try {
+			br = new BufferedReader(new FileReader(spPath));
+			while ((line = br.readLine()) != null) {
+				//List<Integer> sequence = new ArrayList<Integer>();
+				SequentialPattern sp = new SequentialPattern();
+				
+				// use " -1 " as separator in order to split
+				String[] token = line.split(splitBy);
+				
+				//NB. CON token.lenght-2 PERDIAMO IL DATO DEL SUPPORTO !!!
+				//Save the pattern iff the last query in it is the time-expensive query
+				if(Integer.parseInt(token[token.length-2]) == idTE){
+					while(i <= token.length-2){
+						//sequence.add(Integer.parseInt(token[i]));
+						sp.addNode(Integer.parseInt(token[i]));
+						i++;
+					}
+					//put the sequential pattern in the Map
+					//sp.put(sp.size(), sequence);
+					spList.add(sp);
+					i=0;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		System.out.println("Sequential Pattern parsing done\n");
+		return spList;
+	  }
 }
