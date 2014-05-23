@@ -16,20 +16,32 @@ public class SequentialPattern {
 	private List<Long> edgeDuration;
 	//It contains the values of the duration of the edges in each istances of the sequential pattern in the input log
 	//Key 1 refers to edge 1 and the value is the list of duration of each instance of edge 1 found in the input log
-	private Map<Integer, List<Long>> edgeInstancesDuration;
+	private Map<Integer, ArrayList<Long>> edgeInstancesDuration;
 	
 	public SequentialPattern() throws InvalidSequentialPatternException{
 		node = new ArrayList<Integer>();
 		edgeDuration = new ArrayList<Long>();
-		edgeInstancesDuration = new HashMap<Integer, List<Long>>();
+		edgeInstancesDuration = new HashMap<Integer, ArrayList<Long>>();
 		validateState();
+	}
+	
+	public int getNumberOfNodes(){
+		return node.size();
+	}
+	
+	public int getNumberOfEdges(){
+		return edgeDuration.size();
+	}
+	
+	public int getNumberofInstanceEdges(){
+		return edgeInstancesDuration.size();
 	}
 	
 	public void addNode(int n) throws InvalidSequentialPatternException{
 		node.add(n);
 		if(node.size()>=2){
 			edgeDuration.add(null);
-			List<Long> l = new ArrayList<Long>();
+			ArrayList<Long> l = new ArrayList<Long>();
 			edgeInstancesDuration.put(node.size()-2, l);
 		}
 		validateState();
@@ -55,7 +67,7 @@ public class SequentialPattern {
 		int added=0;
 		Date start=null, end=null;
 		long diff;
-		ArrayList<Long> la = new ArrayList<Long>();
+		ArrayList<Long> la;
 		
 		for(int i=0; i<ql.size(); i++){
 			if(ql.get(i)==node.get(k)){
@@ -63,11 +75,14 @@ public class SequentialPattern {
 				else end = tl.get(i);
 				
 				if(end!=null) {
+					la = edgeInstancesDuration.get(k-1);
 					diff=end.getTime()-start.getTime();
 					diff=diff/1000;	//Convert in seconds
 					la.add(diff);
-					System.out.println(diff);
-					edgeInstancesDuration.get(k-1).add(diff);
+					edgeInstancesDuration.put((k-1), la);
+					System.out.println("LA: "+la.size());
+					//edgeInstancesDuration.get(k-1).add(diff);
+					System.out.println("k: "+(k-1));
 					//else	edgeInstancesDuration.get(0).add(diff);
 					added++;
 					//k e i a un passo prima perchè devo riprendere la stessa query che ha chiuso un arco come inizio del prossimo
@@ -81,6 +96,8 @@ public class SequentialPattern {
 				if(k==node.size()) return;
 			}
 		}
+		
+		/*
 		//Alla fine controllo che il sequential pattern sia intero
 		if(k!=node.size()-1){
 			//rimuovo le durate del sequential pattern non completo
@@ -88,6 +105,8 @@ public class SequentialPattern {
 				edgeInstancesDuration.get(j).remove(edgeInstancesDuration.get(j).size()-1);
 			}
 		}
+		*/
+		System.out.println("DURATION SIZE: "+edgeInstancesDuration.get(0).size());
 		validateState();
 		computeDuration();
 	}
