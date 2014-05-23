@@ -70,6 +70,7 @@ public class ReadCSVtoTXT {
 		int key = 0;
         PrintStream outWriter = new PrintStream(output);
         int chunck = 0;
+        int st=0;
         
         association = new HashMap<String, Integer>();
         queryList = new ArrayList<Integer>();
@@ -117,13 +118,16 @@ public class ReadCSVtoTXT {
 				outWriter.print(queryList.get(i)+" -1 ");
 				
 				if(queryList.get(i)==idTE){
-					queryMap.put(chunck, queryList.subList(0, i+1));
-					timestampMap.put(chunck, timestampList.subList(0, i+1));
+					//It creates the maps with chuncks of log
+					queryMap.put(chunck, queryList.subList(st, i+1));
+					timestampMap.put(chunck, timestampList.subList(st, i+1));
 					outWriter.println("-2");
+					//It update the start point of the new chunck
+					st=i+1;
 					chunck++;
 				}
 			}
-			outWriter.println("-2");
+			if(queryList.get(queryList.size()-1)!=idTE)	outWriter.println("-2");
 	 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -139,6 +143,7 @@ public class ReadCSVtoTXT {
 			}
 		}
 		System.out.println("TEXT file created");
+
 		System.out.println("Parsing input done.");
 		
 		/* DEBUG for testing purposes */
@@ -160,29 +165,20 @@ public class ReadCSVtoTXT {
 		/* Now I have to parse outputPrefixSpan.txt in order to retrieve the frequent sequential patter that I need (the ones that
 		contains the time-expensive query) and use them in order to calculate the "duration" of a pattern.. */
 		ReadSP spReader = new ReadSP();
-		//Map<Integer, List<Integer>> sp = spReader.parseSP("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan.txt",idTE);
+
 		List<SequentialPattern> sp = spReader.parseSP("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan.txt",idTE);
 		
-		System.out.println("Size 0: "+sp.get(0).getNumberOfNodes());
-		System.out.println("Edge 0: "+sp.get(0).getNumberOfEdges());
-		System.out.println("Edge Instances 0: "+sp.get(0).getNumberofInstanceEdges());
-		System.out.println("Query Map 0 Size: "+queryMap.get(0).size());
-		System.out.println("Timestamp Map 0 Size: "+timestampMap.get(0).size());
-		//for(int i=0; i<sp.size(); i++){
-			//for(int j=0; j<queryMap.size();j++){
-				sp.get(0).findSequentialPattern(queryMap.get(0), timestampMap.get(0));
-			//}
-		//}
+		for(int i=0; i<sp.size(); i++){
+			for(int j=0; j<queryMap.size();j++){
+				sp.get(i).findSequentialPattern(queryMap.get(j), timestampMap.get(j));
+			}
+			sp.get(i).computeDuration();
+		}
 		
 		/* DEBUG for testing purposes */
 		System.out.println("\n\n----- FOR TESTING PURPOSES -----\n\n");
 		for(int j=0;j<sp.size();j++){
 			SequentialPattern dbg = new SequentialPattern();
-//			dbg = sp.get(j);
-//			for(int k: dbg){
-//				System.out.print(k+" ");
-//			}
-//			System.out.print("\n");
 			dbg=sp.get(j);
 			System.out.println(dbg.toString());
 		}
@@ -190,6 +186,10 @@ public class ReadCSVtoTXT {
 		
 		// "Duration" computation
 
+//		for(int k: dbg){
+//		System.out.print(k+" ");
+//	}
+//	System.out.print("\n");
 	  }
 	  
 }

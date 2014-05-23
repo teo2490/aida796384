@@ -8,6 +8,11 @@ import java.util.Map;
 
 import exception.InvalidSequentialPatternException;
 
+/**
+ * 
+ * @author Matteo 796384
+ *
+ */
 public class SequentialPattern {
 
 	//It contains the id of the query
@@ -15,14 +20,18 @@ public class SequentialPattern {
 	//It contains the middle value of the duration of each edge
 	private List<Long> edgeDuration;
 	//It contains the values of the duration of the edges in each istances of the sequential pattern in the input log
-	//Key 1 refers to edge 1 and the value is the list of duration of each instance of edge 1 found in the input log
-	private Map<Integer, ArrayList<Long>> edgeInstancesDuration;
+	//Position 1 refers to edge 1 and the values are the list of duration of each instance of edge 1 found in the input log
+	private List<List<Long>> edgeInstancesDuration;
 	
 	public SequentialPattern() throws InvalidSequentialPatternException{
 		node = new ArrayList<Integer>();
 		edgeDuration = new ArrayList<Long>();
-		edgeInstancesDuration = new HashMap<Integer, ArrayList<Long>>();
+		edgeInstancesDuration = new ArrayList<List<Long>>();
 		validateState();
+	}
+	
+	public List<Integer> getAllNodes(){
+		return node;
 	}
 	
 	public int getNumberOfNodes(){
@@ -41,8 +50,7 @@ public class SequentialPattern {
 		node.add(n);
 		if(node.size()>=2){
 			edgeDuration.add(null);
-			ArrayList<Long> l = new ArrayList<Long>();
-			edgeInstancesDuration.put(node.size()-2, l);
+			edgeInstancesDuration.add(new ArrayList<Long>());
 		}
 		validateState();
 	}
@@ -59,7 +67,14 @@ public class SequentialPattern {
 		return edgeDuration.get(e);
 	}
 	
-	//DA CONTROLLARE!!!
+	/**
+	 * This function finds if the sequential is in the list of query passed as a paramenter. If it is, it compute the duration
+	 * of each edge from the corresponding list timestamp.
+	 * 
+	 * @param ql The list of query
+	 * @param tl The list of timestamp (at position 0 there is the timestamp of the query at position 0 in ql)
+	 * @throws InvalidSequentialPatternException
+	 */
 	public void findSequentialPattern(List<Integer> ql, List<Date> tl) throws InvalidSequentialPatternException{
 		int k=0;
 		//It counts how many edge is inserted for an hypotethical instance of sp. If the sp is not complete, it is used to remove 
@@ -67,63 +82,54 @@ public class SequentialPattern {
 		int added=0;
 		Date start=null, end=null;
 		long diff;
-		ArrayList<Long> la;
-		
 		for(int i=0; i<ql.size(); i++){
 			if(ql.get(i)==node.get(k)){
 				if(start==null)	start=tl.get(i);
 				else end = tl.get(i);
 				
 				if(end!=null) {
-					la = edgeInstancesDuration.get(k-1);
 					diff=end.getTime()-start.getTime();
 					diff=diff/1000;	//Convert in seconds
-					la.add(diff);
-					edgeInstancesDuration.put((k-1), la);
-					System.out.println("LA: "+la.size());
-					//edgeInstancesDuration.get(k-1).add(diff);
-					System.out.println("k: "+(k-1));
-					//else	edgeInstancesDuration.get(0).add(diff);
+					edgeInstancesDuration.get(k-1).add(diff);
 					added++;
-					//k e i a un passo prima perchè devo riprendere la stessa query che ha chiuso un arco come inizio del prossimo
+					//k and i are decremented because the query that has closed an edge will be the same that will open the next one
 					k--;
 					i--;
 					start = null;
 					end = null;
 				}
-				//PASSO INTERA SEQUENZA O SOLO CHUNCK ??
 				k++;
-				if(k==node.size()) return;
 			}
 		}
 		
-		/*
-		//Alla fine controllo che il sequential pattern sia intero
-		if(k!=node.size()-1){
-			//rimuovo le durate del sequential pattern non completo
+		
+		//It checks the the sp is complete, otherwise it clean the edgeInstancesDuration list from the partial values
+		if(k<node.size()-1){
+			//It removes the duration of the incomplete sp
 			for(int j=0; j<added; j++){
 				edgeInstancesDuration.get(j).remove(edgeInstancesDuration.get(j).size()-1);
 			}
 		}
-		*/
-		System.out.println("DURATION SIZE: "+edgeInstancesDuration.get(0).size());
+
 		validateState();
-		computeDuration();
 	}
 	
+	/**
+	 *  This function computes the middle of the duration for each edge in edgeInstanceDuration and saves it in the corresponding
+	 *  place in edgeDuration.
+	 */
 	public void computeDuration(){
 		long middle;
-		if(edgeDuration.size()>0){
+		if(edgeDuration.size()>0 && edgeInstancesDuration.get(0).size()>0){
 			for(int i=0; i<edgeInstancesDuration.size();i++){
 				middle=0;
 				for(int j=0; j<edgeInstancesDuration.get(i).size(); j++){
 					middle=middle+edgeInstancesDuration.get(i).get(j);
 				}
-				//middle=middle/edgeInstancesDuration.get(i).size();
-				edgeDuration.add(i, middle);
+				middle=middle/edgeInstancesDuration.get(i).size();
+				edgeDuration.set(i, middle);
 			}
 		}
-		System.out.println("END");
 	}
 	
 	private void validateState() throws InvalidSequentialPatternException {
