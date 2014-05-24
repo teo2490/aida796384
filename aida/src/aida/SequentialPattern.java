@@ -51,7 +51,7 @@ public class SequentialPattern {
 		return node.get(n);
 	}
 	
-	public long getDuration(int e){
+	public float getDuration(int e){
 		return edge.get(e).getDuration();
 	}
 	
@@ -121,9 +121,9 @@ public class SequentialPattern {
 		String s = node.get(0).toString();
 			if(node.size()>1){
 				for(int i=1; i<node.size()-1; i++){
-					s=s+" |"+edge.get(i-1).getDuration()+"| "+node.get(i);
+					s=s+" |"+edge.get(i-1).getDuration()+"#"+edge.get(i-1).getVariance()+"| "+node.get(i);
 				}
-				s=s+" |"+edge.get(edge.size()-1).getDuration()+"| "+node.get(node.size()-1);
+				s=s+" |"+edge.get(edge.size()-1).getDuration()+"#"+edge.get(edge.size()-1).getVariance()+"| "+node.get(node.size()-1);
 			}
 		return s;
 	}

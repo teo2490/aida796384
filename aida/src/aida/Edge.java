@@ -5,22 +5,22 @@ import java.util.List;
 
 public class Edge {
 
-	private Long duration;
-	private Long variance;
+	private float duration;
+	private float variance;
 	//It contains the values of the duration of the edges in each istances of the sequential pattern in the input log
 	private List<Long> instancesDuration;
 	
 	public Edge(){
-		duration=null;
-		variance=null;
+		duration=-1;
+		variance=-1;
 		instancesDuration = new ArrayList<Long>();
 	}
 	
-	public Long getDuration(){
+	public float getDuration(){
 		return duration;
 	}
 	
-	public Long getVariance(){
+	public float getVariance(){
 		return variance;
 	}
 	
@@ -37,7 +37,9 @@ public class Edge {
 	}
 	
 	public void computeDurationAndVariance(){
-		long middle = 0;
+		float middle = 0;
+		float sumsq = 0;
+		float v;
 		if(instancesDuration.size()>0){
 			//Computing duration
 			for(int i=0; i<instancesDuration.size();i++){
@@ -45,9 +47,14 @@ public class Edge {
 				}
 			middle=middle/instancesDuration.size();
 			duration = middle;
-		
+			
 			//Computing Variance
-			//..
+			for (int j=0; j<instancesDuration.size() ; j++) 
+	        {
+	            sumsq = sumsq + ((instancesDuration.get(j)-middle) * ((instancesDuration.get(j)-middle)));
+	        }
+	        v = (float) sumsq / instancesDuration.size();
+	        variance=v;
 		}
 	}
 	
