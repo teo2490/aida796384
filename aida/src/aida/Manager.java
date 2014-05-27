@@ -210,7 +210,6 @@ public class Manager {
 				// use " -1 " as separator in order to split
 				String[] token = line.split(splitBy);
 				
-				//NB. CON token.lenght-2 PERDIAMO IL DATO DEL SUPPORTO !!!
 				//Save the pattern iff the last query in it is the time-expensive query
 				if(Integer.parseInt(token[token.length-2]) == idTE){
 					while(i <= token.length-2){
@@ -223,6 +222,9 @@ public class Manager {
 					spList.add(sp);
 					i=0;
 				}
+				//Managing support data
+				String sup=token[token.length-1].replace("#SUP: ", "");
+				sp.setSupport(Integer.parseInt(sup));
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

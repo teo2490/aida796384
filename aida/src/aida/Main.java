@@ -8,8 +8,8 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		 
-		Manager p = new Manager();
-		p.parseCSVtoTXT("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\log_new.csv",
+		Manager m = new Manager();
+		m.parseCSVtoTXT("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\log_new.csv",
 				"C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan.txt",
 				"SELECT * FROM sensors");	 
 		
@@ -24,9 +24,9 @@ public class Main {
 		// Parsing PrefixSPan Output
 		/* Now I have to parse outputPrefixSpan.txt in order to retrieve the frequent sequential patter that I need (the ones that
 		contains the time-expensive query) and use them in order to calculate the "duration" of a pattern.. */
-		List<SequentialPattern> sp = p.parseSP("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan.txt");
+		List<SequentialPattern> sp = m.parseSP("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan.txt");
 		
-		//Finding Sequential Pattern
-		p.findSP(sp);
+		//Finding Sequential Pattern in the chuncks of log
+		m.findSP(sp);
 	  }
 }

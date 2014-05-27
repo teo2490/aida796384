@@ -19,11 +19,22 @@ public class SequentialPattern {
 	private List<Integer> node;
 	//It contains the middle value of the duration of each edge
 	private List<Edge> edge;
+	//The support of the sequential pattern
+	private int sup;
 	
 	public SequentialPattern() throws InvalidSequentialPatternException{
 		node = new ArrayList<Integer>();
 		edge = new ArrayList<Edge>();
+		sup=0;
 		validateState();
+	}
+	
+	public int getSupport(){
+		return sup;
+	}
+	
+	public void setSupport(int s){
+		sup=s;
 	}
 	
 	public List<Integer> getAllNodes(){
@@ -125,6 +136,7 @@ public class SequentialPattern {
 				}
 				s=s+" |"+edge.get(edge.size()-1).getDuration()+"#"+edge.get(edge.size()-1).getVariance()+"| "+node.get(node.size()-1);
 			}
+			s=s+" - @SUP: "+sup;
 		return s;
 	}
 }
