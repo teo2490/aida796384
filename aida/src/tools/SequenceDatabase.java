@@ -124,7 +124,7 @@ public class SequenceDatabase {
 	 * Print this sequence database to System.out.
 	 */
 	public void print() {
-		System.out.println("============  CONTEXTE ==========");
+		System.out.println("============  CONTEXT ==========");
 		for (Sequence sequence : sequences) { // pour chaque objet
 			System.out.print(sequence.getId() + ":  ");
 			sequence.print();

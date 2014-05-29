@@ -17,11 +17,16 @@ public class SequentialPattern {
 
 	//It contains the id of the query
 	private List<Integer> node;
-	//It contains the middle value of the duration of each edge
+	//It contains the objects that connect nodes
 	private List<Edge> edge;
 	//The support of the sequential pattern
 	private int sup;
 	
+	/**
+	 * Default Constructor
+	 * 
+	 * @throws InvalidSequentialPatternException
+	 */
 	public SequentialPattern() throws InvalidSequentialPatternException{
 		node = new ArrayList<Integer>();
 		edge = new ArrayList<Edge>();
@@ -29,6 +34,7 @@ public class SequentialPattern {
 		validateState();
 	}
 	
+	/* Start of the getter and setter methods */
 	public int getSupport(){
 		return sup;
 	}
@@ -49,6 +55,22 @@ public class SequentialPattern {
 		return edge.size();
 	}
 	
+	public int getNode(int n){
+		return node.get(n);
+	}
+	
+	public float getDuration(int e){
+		return edge.get(e).getDuration();
+	}
+	/* End of the getter and setter methods */
+	
+	/**
+	 * This method creates add a new node to the sequetial pattern. If the number of nodes is >1, when a node is added
+	 * a new edge is also added
+	 * 
+	 * @param n	The value of the node
+	 * @throws InvalidSequentialPatternException
+	 */
 	public void addNode(int n) throws InvalidSequentialPatternException{
 		node.add(n);
 		if(node.size()>=2){
@@ -58,16 +80,8 @@ public class SequentialPattern {
 
 	}
 	
-	public int getNode(int n){
-		return node.get(n);
-	}
-	
-	public float getDuration(int e){
-		return edge.get(e).getDuration();
-	}
-	
 	/**
-	 * This function finds if the sequential is in the list of query passed as a paramenter. If it is, it compute the duration
+	 * This function finds if the sequential is in the list of query passed as a parameter. If it is, it compute the duration
 	 * of each edge from the corresponding list timestamp.
 	 * 
 	 * @param ql The list of query
@@ -113,12 +127,23 @@ public class SequentialPattern {
 		validateState();
 	}
 	
+	/**
+	 * This method computes the duration and the variance for each edge in the sequential pattern
+	 */
 	public void computeDuration(){
 		for(int i=0; i<edge.size(); i++){
 			edge.get(i).computeDurationAndVariance();
 		}
 	}
 	
+	/**
+	 * This method is used to validate the state of a sequential pattern. 
+	 * A valid state has two conditions:
+	 * - #edges=#nodes-1 (if there is almost a node)
+	 * - the number of instances of each edge must be equal to the one of the other edeges
+	 * 
+	 * @throws InvalidSequentialPatternException
+	 */
 	private void validateState() throws InvalidSequentialPatternException {
 		if(edge.size() != node.size()-1 && node.size()>=2)	throw new InvalidSequentialPatternException("Invalid edge");
 		
@@ -128,6 +153,9 @@ public class SequentialPattern {
 		}
 	}
 	
+	/**
+	 * This method puts all the information about the sequential pattern in a well formatted string
+	 */
 	public String toString(){
 		String s = node.get(0).toString();
 			if(node.size()>1){

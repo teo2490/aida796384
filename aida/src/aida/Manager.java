@@ -147,11 +147,12 @@ public class Manager {
 		
 		/* DEBUG for testing purposes */
 		System.out.println("\n\n----- FOR TESTING PURPOSES -----\n\n");
-		for(Date t: timestampList)	System.out.println(t.toString());
+		System.out.println(association.toString());
 		System.out.println("------------");
-		for(int q: queryList)	System.out.println(q);
+		for(int qt=0; qt<queryList.size();qt++){	//queryList and timestampList have the same lenght by construction
+			System.out.println(queryList.get(qt)+" <-> "+timestampList.get(qt));
+		}
 		System.out.println("\n\n----- FOR TESTING PURPOSES -----\n\n");
-		
 	  }
 	  
 	  /**
