@@ -10,7 +10,7 @@ import exception.InvalidSequentialPatternException;
  * This class is the object that stands for a sequential pattern. It has a list of node (element of the sequential pattern) and a
  * list of edges (the object between nodes).
  * 
- * @author Matteo 796384
+ * @author Matteo Simoni 796384
  *
  */
 public class SequentialPattern {
