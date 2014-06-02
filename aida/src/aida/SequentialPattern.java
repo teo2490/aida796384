@@ -22,6 +22,9 @@ public class SequentialPattern {
 	//The support of the sequential pattern
 	private int sup;
 	
+	//This is a pointer to the next node that has to be checked in this sequential pattern in the forcasting phase
+	private int nextNodeToCheck;
+	
 	/**
 	 * Default Constructor
 	 * 
@@ -31,6 +34,7 @@ public class SequentialPattern {
 		node = new ArrayList<Integer>();
 		edge = new ArrayList<Edge>();
 		sup=0;
+		nextNodeToCheck=1;
 		validateState();
 	}
 	
@@ -134,6 +138,22 @@ public class SequentialPattern {
 		for(int i=0; i<edge.size(); i++){
 			edge.get(i).computeDurationAndVariance();
 		}
+	}
+	
+	/**
+	 * This method returns the next node that has to be checked in the forecasting phase
+	 * 
+	 * @return
+	 */
+	public int getNextNodeToCheck(){
+		return nextNodeToCheck;
+	}
+	
+	/**
+	 * This method increases the next node that has to be checked in the forecasting phase
+	 */
+	public void incrementNextNodeToCheck(){
+		nextNodeToCheck++;
 	}
 	
 	/**

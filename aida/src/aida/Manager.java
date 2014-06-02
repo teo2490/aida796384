@@ -211,8 +211,8 @@ public class Manager {
 				// use " -1 " as separator in order to split
 				String[] token = line.split(splitBy);
 				
-				//Save the pattern iff the last query in it is the time-expensive query
-				if(Integer.parseInt(token[token.length-2]) == idTE){
+				//Save the pattern iff the last query in it is the time-expensive query //TOLTI 1-lenght SP CON SECONDA CONDIZIONE
+				if(Integer.parseInt(token[token.length-2]) == idTE && token.length-2 != 0){
 					while(i <= token.length-2){
 						//sequence.add(Integer.parseInt(token[i]));
 						sp.addNode(Integer.parseInt(token[i]));

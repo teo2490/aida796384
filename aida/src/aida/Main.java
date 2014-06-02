@@ -2,12 +2,18 @@ package aida;
 
 import java.util.List;
 
+import forecast.Listener;
+import forecast.Simulator;
+
 import prefixspan.MainTestPrefixSpan_saveToFile;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		 
+		
+		/* --- START of 1st part code --- */
+		System.out.println("----------------------- 1st PART output -----------------------");
+		
 		Manager m = new Manager();
 		m.parseCSVtoTXT("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\log_new.csv",
 				"C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan.txt",
@@ -28,5 +34,22 @@ public class Main {
 		
 		//Finding Sequential Pattern in the chuncks of log
 		m.findSP(sp);
+		/* --- END of 1st part code --- */
+		
+		/* --- START of 2nd part code --- */
+		System.out.println("----------------------- 2nd PART output -----------------------");
+		
+		Simulator initiater = new Simulator(4);
+        Listener r1 = new Listener(sp);
+
+        initiater.addListener(r1);
+
+        for(int i=0; i<10; i++){
+        	initiater.makeQuery();
+        }
+		
+        System.out.println(r1.spOnGoingSize());
+		
+		/* --- END of 2nd part code --- */
 	  }
 }
