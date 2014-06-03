@@ -38,7 +38,6 @@ public class Main {
 		
 		/* --- START of 2nd part code --- */
 		System.out.println("----------------------- 2nd PART output -----------------------");
-		
 		Simulator initiater = new Simulator(4);
         Listener r1 = new Listener(sp);
 
@@ -47,8 +46,6 @@ public class Main {
         for(int i=0; i<10; i++){
         	initiater.makeQuery();
         }
-		
-        System.out.println(r1.spOnGoingSize());
 		
 		/* --- END of 2nd part code --- */
 	  }

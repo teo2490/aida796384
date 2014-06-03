@@ -38,6 +38,19 @@ public class SequentialPattern {
 		validateState();
 	}
 	
+	public SequentialPattern cloneSP() throws InvalidSequentialPatternException{
+		SequentialPattern cloned = new SequentialPattern();
+		cloned.setSupport(this.getSupport());
+		cloned.setNextNodeToCheck(this.getNextNodeToCheck());
+		for(int i=0; i<node.size();i++){
+			cloned.addNode(this.getNode(i));
+		}
+		for(int j=0; j<edge.size(); j++){
+			cloned.setEdge(edge.get(j), j);
+		}
+		return cloned;
+	}
+	
 	/* Start of the getter and setter methods */
 	public int getSupport(){
 		return sup;
@@ -47,8 +60,16 @@ public class SequentialPattern {
 		sup=s;
 	}
 	
+	public void setNextNodeToCheck(int n){
+		nextNodeToCheck=n;
+	}
+	
 	public List<Integer> getAllNodes(){
 		return node;
+	}
+	
+	public void setEdge(Edge e, int pos){
+		edge.set(pos, e);
 	}
 	
 	public int getNumberOfNodes(){
