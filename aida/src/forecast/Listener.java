@@ -27,9 +27,10 @@ public class Listener implements QueryListener  {
 	 * After it has checked the partially recognized sp list, it checks the original list of the sequential pattern in order to
 	 * found if the query just executed could be the starting point for a new sp. In this case it update the partially recognized
 	 * sequential pattern list with the new partial sp. 
+	 * @throws InterruptedException 
 	 */
 	@Override
-    public void someoneMadeQuery(int q) throws InvalidSequentialPatternException {
+    public void someoneMadeQuery(int q) throws InvalidSequentialPatternException, InterruptedException {
         
 		//It checks the partially recognized sequential pattern list.
         if(spOnGoing.size()>0){
@@ -40,9 +41,12 @@ public class Listener implements QueryListener  {
 	        		SequentialPattern newSP = currentSp.cloneSP();
 	        		newSP.incrementNextNodeToCheck();
 	        		spOnGoing.add(newSP);
-	        		//If a sequential pattern is complete, it is removed from the list of partial sp
-	        		if(newSP.getNextNodeToCheck() == newSP.getNumberOfNodes()){
-		        		System.out.println("Sequential Pattern Found! "+newSP.toString());
+	        		//If a sequential pattern is complete (except for the last node that is the teQuery), it is removed 
+	        		//from the list of partial sp and the index creation is scheduled
+	        		if(newSP.getNextNodeToCheck() == newSP.getNumberOfNodes()-1){
+	        			long waitTime=timeForIndexCreation(newSP);
+	        			Thread.sleep(waitTime*1000);
+	        			System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+System.nanoTime());
 		        		spOnGoing.remove(spOnGoing.size()-1);
 		        	}
 	        	}
@@ -55,4 +59,18 @@ public class Listener implements QueryListener  {
         }
     }
 	
+	/**
+	 * This method is called when the last query before the time-expensive one is exectuted and computes the time 
+	 * in which the indexes for that query has to be created.
+	 * 
+	 * @param s	The completed sequential pattern (except for the time-expensive query)
+	 * @return	The time to wait before indexes creation
+	 */
+	private long timeForIndexCreation(SequentialPattern s){
+		float floatWaitTime = s.getDuration(s.getNumberOfEdges()-1) - s.getVariance(s.getNumberOfEdges()-1);
+		long waitTime = (long) floatWaitTime;
+		if(waitTime<0)	waitTime=0;
+		
+		return waitTime;
+	}
 }

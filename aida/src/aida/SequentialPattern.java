@@ -87,6 +87,10 @@ public class SequentialPattern {
 	public float getDuration(int e){
 		return edge.get(e).getDuration();
 	}
+	
+	public float getVariance(int e){
+		return edge.get(e).getVariance();
+	}
 	/* End of the getter and setter methods */
 	
 	/**
