@@ -7,6 +7,14 @@ import exception.InvalidSequentialPatternException;
 
 import aida.SequentialPattern;
 
+/**
+ * This class is the implementation of the QueryListener interface. It represents the component of our system that listen to
+ * the query flowing and search for some valid sequential pattern in it.
+ * If a sequential pattern is found, this component is responsible to create the more suitable indexes.
+ * 
+ * @author Matteo Simoni 796384
+ *
+ */
 public class Listener implements QueryListener  {
 	
 	//The list of the known sequential pattern

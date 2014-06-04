@@ -41,6 +41,12 @@ public class SequentialPattern {
 		validateState();
 	}
 	
+	/**
+	 * This method perform a deep cloning of a sequential pattern.
+	 * 
+	 * @return The cloned sequential pattern
+	 * @throws InvalidSequentialPatternException
+	 */
 	public SequentialPattern cloneSP() throws InvalidSequentialPatternException{
 		SequentialPattern cloned = new SequentialPattern();
 		cloned.setSupport(this.getSupport());
@@ -192,8 +198,6 @@ public class SequentialPattern {
 	public void incrementNextNodeToCheck(){
 		nextNodeToCheck++;
 	}
-	
-	
 	
 	/**
 	 * This method is used to validate the state of a sequential pattern. 
