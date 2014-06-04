@@ -24,6 +24,8 @@ public class SequentialPattern {
 	
 	//This is a pointer to the next node that has to be checked in this sequential pattern in the forcasting phase
 	private int nextNodeToCheck;
+	//This is a reminder for the last matching of a query from the flow with a query in the sequential pattern.
+	private long lastCheck;
 	
 	/**
 	 * Default Constructor
@@ -35,6 +37,7 @@ public class SequentialPattern {
 		edge = new ArrayList<Edge>();
 		sup=0;
 		nextNodeToCheck=1;
+		lastCheck=0;
 		validateState();
 	}
 	
@@ -42,6 +45,7 @@ public class SequentialPattern {
 		SequentialPattern cloned = new SequentialPattern();
 		cloned.setSupport(this.getSupport());
 		cloned.setNextNodeToCheck(this.getNextNodeToCheck());
+		cloned.setLastCheck(this.getLastCheck());
 		for(int i=0; i<node.size();i++){
 			cloned.addNode(this.getNode(i));
 		}
@@ -91,6 +95,14 @@ public class SequentialPattern {
 	public float getVariance(int e){
 		return edge.get(e).getVariance();
 	}
+	
+	public long getLastCheck(){
+		return lastCheck;
+	}
+	
+	public void setLastCheck(long i){
+		lastCheck=i;
+	}
 	/* End of the getter and setter methods */
 	
 	/**
@@ -131,7 +143,7 @@ public class SequentialPattern {
 				
 				if(end!=null) {
 					diff=end.getTime()-start.getTime();
-					diff=diff/1000;	//Convert in seconds
+					//diff=diff/1000;	//Convert in seconds
 					edge.get(k-1).addInstance(diff);
 					added++;
 					//k and i are decremented because the query that has closed an edge will be the same that will open the next one
@@ -180,6 +192,8 @@ public class SequentialPattern {
 	public void incrementNextNodeToCheck(){
 		nextNodeToCheck++;
 	}
+	
+	
 	
 	/**
 	 * This method is used to validate the state of a sequential pattern. 

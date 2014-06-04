@@ -23,7 +23,7 @@ public class Simulator {
     	
     	int randomInt = randomGenerator.nextInt(seed);
     	
-    	Thread.sleep(randomInt*1000);
+    	Thread.sleep(randomInt*1000*2);
     	
         System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
 

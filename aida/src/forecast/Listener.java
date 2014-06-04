@@ -31,33 +31,59 @@ public class Listener implements QueryListener  {
 	 */
 	@Override
     public void someoneMadeQuery(int q) throws InvalidSequentialPatternException, InterruptedException {
-        
+		
 		//It checks the partially recognized sequential pattern list.
         if(spOnGoing.size()>0){
 	        for(int j=0; j<spOnGoing.size();j++){
 	        	SequentialPattern currentSp = spOnGoing.get(j);
+	        	
+	        	long time = System.currentTimeMillis();
+	        	
 	        	if(currentSp.getNextNodeToCheck() < currentSp.getNumberOfNodes() && currentSp.getNode(currentSp.getNextNodeToCheck()) == q){
-	        		//If the queries is the next of a partial sp, it is copied, updated and added to the list of partial sp
-	        		SequentialPattern newSP = currentSp.cloneSP();
-	        		newSP.incrementNextNodeToCheck();
-	        		spOnGoing.add(newSP);
-	        		//If a sequential pattern is complete (except for the last node that is the teQuery), it is removed 
-	        		//from the list of partial sp and the index creation is scheduled
-	        		if(newSP.getNextNodeToCheck() == newSP.getNumberOfNodes()-1){
-	        			long waitTime=timeForIndexCreation(newSP);
-	        			Thread.sleep(waitTime*1000);
-	        			System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+System.nanoTime());
-		        		spOnGoing.remove(spOnGoing.size()-1);
+	        		//If the queries is the next of a partial sp (that is yet valid due to time constraint), it is copied, 
+	        		//updated and added to the list of partial sp
+	        		if(checkValidity(currentSp, time)==true){
+		        		SequentialPattern newSP = currentSp.cloneSP();
+		        		newSP.incrementNextNodeToCheck();
+		        		newSP.setLastCheck(time);
+		        		spOnGoing.add(newSP);
+		        		//If a sequential pattern is complete (except for the last node that is the teQuery), it is removed 
+		        		//from the list of partial sp and the index creation is scheduled
+		        		if(newSP.getNextNodeToCheck() == newSP.getNumberOfNodes()-1){
+		        			long waitTime=timeForIndexCreation(newSP);
+		        			Thread.sleep(waitTime*1000);
+		        			System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
+			        		spOnGoing.remove(spOnGoing.size()-1);
+		        		}
+		        	} else {
+		        		//If the partial sequential pattern is not valid anymore due to time constraint
+		        		System.out.println("REMOVED: "+currentSp.toString());
+		        		spOnGoing.remove(j);
 		        	}
-	        	}
+	        	} 
 	        }
         }
         
-        //It checks the original list
+        //It checks the original list.
         for(int i=0;i<sp.size();i++){
         	if(sp.get(i).getNode(0) == q)	spOnGoing.add(sp.get(i));
         }
     }
+	
+	/**
+	 * This method checks the validity of a partial sequential pattern. 
+	 * If the elapsed time from the check of the last query and the check of a new one is greater than the duration of the edge 
+	 * plus the variance, then the sp is not valid anymore.
+	 *  
+	 * @param s The partial sp that has to be checked
+	 * @param t The time at which the new query has been checked
+	 * @return true if the sp is yet valid, false otherwise
+	 */
+	public boolean checkValidity(SequentialPattern s, long t){
+		if(s.getLastCheck()==0)	return true;	//If it is the first node of a sp, return true
+		else if(t<s.getLastCheck()+s.getDuration(s.getNextNodeToCheck()-1)+s.getVariance(s.getNextNodeToCheck()-1))	return true;
+		return false;
+	}
 	
 	/**
 	 * This method is called when the last query before the time-expensive one is exectuted and computes the time 
