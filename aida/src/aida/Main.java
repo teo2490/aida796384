@@ -38,18 +38,18 @@ public class Main {
 		
 		/* --- START of 2nd part code --- */
 		System.out.println("----------------------- 2nd PART output -----------------------");
-		Simulator initiater = new Simulator(4);
+		Simulator initiater = new Simulator(5);
         Listener r1 = new Listener(sp);
 
         initiater.addListener(r1);
 
         System.out.println("\nSTARTING EXECUTION!\n");
         
-//        for(int i=0; i<10; i++){
-//        	//Long pausing time in order to make some partial so invalid due to time constraint
-//        	if(i==6)	Thread.sleep(260000);
-//        	initiater.makeQuery();
-//        }
+        for(int i=0; i<10; i++){
+        	//Long pausing time in order to make some partial so invalid due to time constraint
+        	if(i==6)	Thread.sleep(260000);
+        	initiater.makeQuery();
+        }
         
         System.out.println("\nSTOP EXECUTION!");
 		

@@ -49,6 +49,8 @@ public class Simulator {
     	
     	Thread.sleep(randomInt*1000*2);
     	
+    	if(randomInt==0)	randomInt=randomInt+1;
+    	
         System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
 
         // Notify everybody that may be interested.

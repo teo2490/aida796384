@@ -40,12 +40,12 @@ public class Listener implements QueryListener  {
 	@Override
     public void someoneMadeQuery(int q) throws InvalidSequentialPatternException, InterruptedException {
 		
+		long time = System.currentTimeMillis();
+		
 		//It checks the partially recognized sequential pattern list.
         if(spOnGoing.size()>0){
 	        for(int j=0; j<spOnGoing.size();j++){
 	        	SequentialPattern currentSp = spOnGoing.get(j);
-	        	
-	        	long time = System.currentTimeMillis();
 	        	
 	        	if(currentSp.getNextNodeToCheck() < currentSp.getNumberOfNodes() && currentSp.getNode(currentSp.getNextNodeToCheck()) == q){
 	        		//If the queries is the next of a partial sp (that is yet valid due to time constraint), it is copied, 
@@ -74,7 +74,15 @@ public class Listener implements QueryListener  {
         
         //It checks the original list.
         for(int i=0;i<sp.size();i++){
-        	if(sp.get(i).getNode(0) == q)	spOnGoing.add(sp.get(i));
+        	if(sp.get(i).getNode(0) == q){
+        		spOnGoing.add(sp.get(i));
+        		//If a sequential pattern is complete (except for the last node that is the teQuery), the index creation is scheduled
+        		if(spOnGoing.get(spOnGoing.size()-1).getNextNodeToCheck() == spOnGoing.get(spOnGoing.size()-1).getNumberOfNodes()-1){
+        			long waitTime=timeForIndexCreation(spOnGoing.get(spOnGoing.size()-1));
+        			Thread.sleep(waitTime*1000);
+        			System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
+        		}
+        	}
         }
     }
 	
