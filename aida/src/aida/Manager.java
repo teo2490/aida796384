@@ -165,7 +165,9 @@ public class Manager {
 	  public void findSP(List<SequentialPattern> sp) throws InvalidSequentialPatternException{
 		  for(int i=0; i<sp.size(); i++){
 				for(int j=0; j<queryMap.size();j++){
+					System.out.println("START "+j+" CHUNCK: "+sp.get(i).toString());
 					sp.get(i).findSequentialPattern(queryMap.get(j), timestampMap.get(j));
+					System.out.println("END "+j+" CHUNCK: "+sp.get(i).toString()+"\n");
 				}
 				sp.get(i).computeDuration();
 			}

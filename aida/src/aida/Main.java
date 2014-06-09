@@ -45,11 +45,11 @@ public class Main {
 
         System.out.println("\nSTARTING EXECUTION!\n");
         
-        for(int i=0; i<10; i++){
-        	//Long pausing time in order to make some partial so invalid due to time constraint
-        	if(i==6)	Thread.sleep(260000);
-        	initiater.makeQuery();
-        }
+//        for(int i=0; i<10; i++){
+//        	//Long pausing time in order to make some partial so invalid due to time constraint
+//        	if(i==6)	Thread.sleep(260000);
+//        	initiater.makeQuery();
+//        }
         
         System.out.println("\nSTOP EXECUTION!");
 		
