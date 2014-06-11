@@ -26,6 +26,8 @@ public class SequentialPattern {
 	private int nextNodeToCheck;
 	//This is a reminder for the last matching of a query from the flow with a query in the sequential pattern.
 	private long lastCheck;
+	//This field knows if the indexes for this sp are already scheduled or not
+	private boolean indexScheduled;
 	
 	/**
 	 * Default Constructor
@@ -38,6 +40,7 @@ public class SequentialPattern {
 		sup=0;
 		nextNodeToCheck=1;
 		lastCheck=0;
+		indexScheduled=false;
 		validateState();
 	}
 	
@@ -188,10 +191,10 @@ public class SequentialPattern {
 					if(ql.get(i)==node.get(k+1) && partialSpIsPresentBackward(ql, k, t) && partialSpIsPresentForward(ql, k+1, i)){
 						end = tl.get(i);
 						diff=end.getTime()-start.getTime();
-						System.out.println("S: "+start);
+						/*System.out.println("S: "+start);
 						System.out.println("E: "+end);
 						System.out.println(diff);
-						System.out.println("k: "+k);
+						System.out.println("k: "+k);*/
 						//diff=diff/1000;	//Convert in seconds
 						edge.get(k).addInstance(diff);
 					}
@@ -212,9 +215,7 @@ public class SequentialPattern {
 	 * @throws InvalidSequentialPatternException
 	 */
 	public void findSequentialPattern(List<Integer> ql, List<Date> tl) throws InvalidSequentialPatternException{
-		System.out.println(edge.size());
 		for(int i=0; i<edge.size(); i++){
-			System.out.println("EDGE");
 			findEdgeInstance(ql, tl, i);
 		}
 		/*------------------------------------
@@ -321,6 +322,28 @@ public class SequentialPattern {
 		nextNodeToCheck++;
 	}
 	
+	/**
+	 * This method checks if the indexes for this sp are already implemented or not.
+	 * 
+	 * @return true if the indexes are implemented, false otherwise
+	 */
+	public boolean isScheduled(){
+		return indexScheduled;
+	}
+	
+	/**
+	 * This method schedule the creation of indexes for this sp
+	 */
+	public void schedule(){
+		indexScheduled=true;
+	}
+	
+	/**
+	 * This method removes indexes already created for this sp
+	 */
+	public void unschedule(){
+		indexScheduled=false;
+	}
 	
 	/**
 	 * This method is used to validate the state of a sequential pattern. 
@@ -339,6 +362,45 @@ public class SequentialPattern {
 		}
 	}
 	
+	/**
+	 * AUTO-GENERATED hashCode method
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((edge == null) ? 0 : edge.hashCode());
+		result = prime * result + ((node == null) ? 0 : node.hashCode());
+		return result;
+	}
+
+	/**
+	 * AUTO-GENERATED equals method
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SequentialPattern other = (SequentialPattern) obj;
+		if (edge == null) {
+			if (other.edge != null)
+				return false;
+		} else if (!edge.equals(other.edge))
+			return false;
+		if (node == null) {
+			if (other.node != null)
+				return false;
+		} else if (!node.equals(other.node))
+			return false;
+		return true;
+	}
+
 	/**
 	 * This method puts all the information about the sequential pattern in a well formatted string
 	 */

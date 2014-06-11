@@ -41,6 +41,7 @@ public class Listener implements QueryListener  {
     public void someoneMadeQuery(int q) throws InvalidSequentialPatternException, InterruptedException {
 		
 		long time = System.currentTimeMillis();
+		int pos=-1;
 		
 		//It checks the partially recognized sequential pattern list.
         if(spOnGoing.size()>0){
@@ -58,9 +59,16 @@ public class Listener implements QueryListener  {
 		        		//If a sequential pattern is complete (except for the last node that is the teQuery), it is removed 
 		        		//from the list of partial sp and the index creation is scheduled
 		        		if(newSP.getNextNodeToCheck() == newSP.getNumberOfNodes()-1){
+		        			//calculating the time to wait before scheduling index creation
 		        			long waitTime=timeForIndexCreation(newSP);
+		        			//finding the position of the current sp in the original sp list
+		        			pos = findPositionInSpList(newSP);
 		        			Thread.sleep(waitTime*1000);
-		        			System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
+		        			//if the indexes for the current sp are not implemented, it schedule its implementation
+		        			if(sp.get(pos).isScheduled()==false){
+		        				System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
+		        				sp.get(pos).schedule();
+		        			}
 			        		spOnGoing.remove(spOnGoing.size()-1);
 		        		}
 		        	} else {
@@ -79,12 +87,34 @@ public class Listener implements QueryListener  {
         		//If a sequential pattern is complete (except for the last node that is the teQuery), the index creation is scheduled
         		if(spOnGoing.get(spOnGoing.size()-1).getNextNodeToCheck() == spOnGoing.get(spOnGoing.size()-1).getNumberOfNodes()-1){
         			long waitTime=timeForIndexCreation(spOnGoing.get(spOnGoing.size()-1));
+        			//finding the position of the current sp in the original sp list
+        			pos = findPositionInSpList(spOnGoing.get(spOnGoing.size()-1));
         			Thread.sleep(waitTime*1000);
-        			System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
+        			//if the indexes for the current sp are not implemented, it schedule its implementation
+        			if(sp.get(pos).isScheduled()==false){
+        				System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
+        				sp.get(pos).schedule();
+        			}
         		}
         	}
         }
     }
+	
+	/**
+	 * This method scans the original list of sequential pattern in order to find if there is a sequential pattern equal to
+	 * the one passed as paramenter.
+	 * 
+	 * @param s The sequential pattern to search in the original list
+	 * @return The position of the sp passed as paramenter in the original list
+	 */
+	public int findPositionInSpList(SequentialPattern s){
+		for(int i=0; i<sp.size(); i++){
+			if(sp.get(i).equals(s)){
+				return i;
+			}
+		}
+		return -1;
+	}
 	
 	/**
 	 * This method checks the validity of a partial sequential pattern. 

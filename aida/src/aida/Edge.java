@@ -17,7 +17,7 @@ public class Edge {
 	private float variance;
 	//It contains the values of the duration of the edges in each istances of the sequential pattern in the input log
 	private List<Long> instancesDuration;
-	
+
 	/**
 	 * Default constructor. It sets the attributes to an invalid value.
 	 */
@@ -82,5 +82,39 @@ public class Edge {
 		}
 	}
 	
+	/**
+	 * AUTO-GENERATED hashCode method
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Float.floatToIntBits(duration);
+		result = prime * result + Float.floatToIntBits(variance);
+		return result;
+	}
+	
+	/**
+	 * AUTO-GENERATED equals method
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Edge other = (Edge) obj;
+		if (Float.floatToIntBits(duration) != Float
+				.floatToIntBits(other.duration))
+			return false;
+		if (Float.floatToIntBits(variance) != Float
+				.floatToIntBits(other.variance))
+			return false;
+		return true;
+	}
 	
 }
