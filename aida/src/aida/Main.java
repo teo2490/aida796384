@@ -11,6 +11,8 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		
+		float timeForCreation=80000;
+		
 		/* --- START of 1st part code --- */
 		System.out.println("----------------------- 1st PART output -----------------------");
 		
@@ -38,8 +40,9 @@ public class Main {
 		
 		/* --- START of 2nd part code --- */
 		System.out.println("----------------------- 2nd PART output -----------------------");
+		System.out.println("\nIndex implementation time: "+timeForCreation);
 		Simulator initiater = new Simulator(5);
-        Listener r1 = new Listener(sp);
+        Listener r1 = new Listener(sp, timeForCreation);
 
         initiater.addListener(r1);
 
@@ -47,12 +50,13 @@ public class Main {
         
         for(int i=0; i<10; i++){
         	//Long pausing time in order to make some partial so invalid due to time constraint
-        	if(i==6)	Thread.sleep(260000);
+        	if(i==6)	Thread.sleep(120000);
         	initiater.makeQuery();
         }
-        
+        /* Used in place of the for-block for ad-hoc testin purposes
+        initiater.makeQuery();
         System.out.println("\nSTOP EXECUTION!");
-		
+		*/
 		/* --- END of 2nd part code --- */
 	  }
 }

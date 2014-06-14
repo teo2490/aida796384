@@ -45,6 +45,7 @@ public class Simulator {
      */
     public void makeQuery() throws InterruptedException, InvalidSequentialPatternException {
     	
+    	
     	int randomInt = randomGenerator.nextInt(seed);
     	
     	Thread.sleep(randomInt*1000*2);
@@ -56,6 +57,28 @@ public class Simulator {
         // Notify everybody that may be interested.
         for (QueryListener hl : listeners)
             hl.someoneMadeQuery(randomInt);
+        
+        /* Another body for makeQuery() function for ad-hoc testing purposes
+    	for (QueryListener hl : listeners){
+    		System.out.println("Query 3 executed! @ "+System.nanoTime());
+    		hl.someoneMadeQuery(3);
+    	}
+    	Thread.sleep(50000);
+    	for (QueryListener hl : listeners){
+    		System.out.println("Query 3 executed! @ "+System.nanoTime());
+    		hl.someoneMadeQuery(3);
+    	}
+    	Thread.sleep(50000);
+    	for (QueryListener hl : listeners){
+    		System.out.println("Query 1 executed! @ "+System.nanoTime());
+    		hl.someoneMadeQuery(1);
+    	}
+    	Thread.sleep(50000);
+    	for (QueryListener hl : listeners){
+    		System.out.println("Query 2 executed! @ "+System.nanoTime());
+    		hl.someoneMadeQuery(2);
+    	}
+    	*/    	
     }
 }
 

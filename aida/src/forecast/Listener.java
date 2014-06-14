@@ -21,9 +21,12 @@ public class Listener implements QueryListener  {
 	private List<SequentialPattern> sp;
 	//The list of the sequential pattern partially found in the flow of query
 	private List<SequentialPattern> spOnGoing = new ArrayList<SequentialPattern>();
+	//The time required for index creation
+	private float timeForCreation;
 	
-	public Listener(List<SequentialPattern> sp){
+	public Listener(List<SequentialPattern> sp, float t){
 		this.sp=sp;
+		timeForCreation=t;
 	}
 	
 	/**
@@ -56,14 +59,17 @@ public class Listener implements QueryListener  {
 		        		newSP.incrementNextNodeToCheck();
 		        		newSP.setLastCheck(time);
 		        		spOnGoing.add(newSP);
-		        		//If a sequential pattern is complete (except for the last node that is the teQuery), it is removed 
-		        		//from the list of partial sp and the index creation is scheduled
-		        		if(newSP.getNextNodeToCheck() == newSP.getNumberOfNodes()-1){
+		        		//If the remaining time of a sp (the sum of its remaining edges duration without considering the
+		        		//next edge to check) is lower than the time needed for index creation, it is removed from the list
+		        		//of partial sp and the index creation is scheduled
+		        		if(newSP.getRemainingTime()<=timeForCreation){
+		        			
 		        			//calculating the time to wait before scheduling index creation
-		        			long waitTime=timeForIndexCreation(newSP);
+		        			//long waitTime=timeForIndexCreation(newSP); //??
+		        			
 		        			//finding the position of the current sp in the original sp list
 		        			pos = findPositionInSpList(newSP);
-		        			Thread.sleep(waitTime*1000);
+		        			//Thread.sleep(waitTime*1000); //??
 		        			//if the indexes for the current sp are not implemented, it schedule its implementation
 		        			if(sp.get(pos).isScheduled()==false){
 		        				System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
@@ -73,7 +79,7 @@ public class Listener implements QueryListener  {
 		        		}
 		        	} else {
 		        		//If the partial sequential pattern is not valid anymore due to time constraint
-		        		System.out.println("REMOVED: "+currentSp.toString());
+		        		System.out.println("Removed old sp for time constraint: "+currentSp.toString());
 		        		spOnGoing.remove(j);
 		        	}
 	        	} 
@@ -84,18 +90,24 @@ public class Listener implements QueryListener  {
         for(int i=0;i<sp.size();i++){
         	if(sp.get(i).getNode(0) == q){
         		spOnGoing.add(sp.get(i));
+        		
+        		//Increment and decrement (before the end of the if-block the next node to check in order to make the
+        		//getRemainingTime() function work.
+        		spOnGoing.get(spOnGoing.size()-1).incrementNextNodeToCheck();
+        		spOnGoing.get(spOnGoing.size()-1).setLastCheck(time);
         		//If a sequential pattern is complete (except for the last node that is the teQuery), the index creation is scheduled
-        		if(spOnGoing.get(spOnGoing.size()-1).getNextNodeToCheck() == spOnGoing.get(spOnGoing.size()-1).getNumberOfNodes()-1){
-        			long waitTime=timeForIndexCreation(spOnGoing.get(spOnGoing.size()-1));
+        		if(spOnGoing.get(spOnGoing.size()-1).getRemainingTime()<=timeForCreation){
+        			//long waitTime=timeForIndexCreation(spOnGoing.get(spOnGoing.size()-1)); //?
         			//finding the position of the current sp in the original sp list
         			pos = findPositionInSpList(spOnGoing.get(spOnGoing.size()-1));
-        			Thread.sleep(waitTime*1000);
+        			//Thread.sleep(waitTime*1000); //?
         			//if the indexes for the current sp are not implemented, it schedule its implementation
         			if(sp.get(pos).isScheduled()==false){
         				System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
         				sp.get(pos).schedule();
         			}
         		}
+        		spOnGoing.get(spOnGoing.size()-1).decrementNextNodeToCheck();
         	}
         }
     }
@@ -127,9 +139,11 @@ public class Listener implements QueryListener  {
 	 */
 	public boolean checkValidity(SequentialPattern s, long t){
 		if(s.getLastCheck()==0)	return true;	//If it is the first node of a sp, return true
-		else if(t<s.getLastCheck()+s.getDuration(s.getNextNodeToCheck()-1)+s.getVariance(s.getNextNodeToCheck()-1))	return true;
+		else if(t<s.getLastCheck()+s.getDuration(s.getNextNodeToCheck()-1)/*+s.getVariance(s.getNextNodeToCheck()-1)*/)	return true;
 		return false;
+		//AT THE STATE OF ART, WE ARE NOT CONSIDERING VARIANCE !!
 	}
+	
 	
 	/**
 	 * This method is called when the last query before the time-expensive one is exectuted and computes the time 

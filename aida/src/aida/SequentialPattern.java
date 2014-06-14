@@ -191,10 +191,6 @@ public class SequentialPattern {
 					if(ql.get(i)==node.get(k+1) && partialSpIsPresentBackward(ql, k, t) && partialSpIsPresentForward(ql, k+1, i)){
 						end = tl.get(i);
 						diff=end.getTime()-start.getTime();
-						/*System.out.println("S: "+start);
-						System.out.println("E: "+end);
-						System.out.println(diff);
-						System.out.println("k: "+k);*/
 						//diff=diff/1000;	//Convert in seconds
 						edge.get(k).addInstance(diff);
 					}
@@ -323,6 +319,13 @@ public class SequentialPattern {
 	}
 	
 	/**
+	 * This method decreases the next node that has to be checked in the forecasting phase
+	 */
+	public void decrementNextNodeToCheck(){
+		nextNodeToCheck--;
+	}
+	
+	/**
 	 * This method checks if the indexes for this sp are already implemented or not.
 	 * 
 	 * @return true if the indexes are implemented, false otherwise
@@ -343,6 +346,15 @@ public class SequentialPattern {
 	 */
 	public void unschedule(){
 		indexScheduled=false;
+	}
+	
+	public float getRemainingTime(){
+		float last=0;
+		if(nextNodeToCheck==node.size()-1)	return last;
+		for(int i=nextNodeToCheck-1; i<getNumberOfEdges(); i++){
+			last=last+edge.get(i).getDuration();
+		}
+		return last;
 	}
 	
 	/**
