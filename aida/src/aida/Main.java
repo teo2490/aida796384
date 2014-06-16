@@ -2,6 +2,9 @@ package aida;
 
 import java.util.List;
 
+import aidaController.AidaController;
+import aidaView.AidaView;
+
 import forecast.Listener;
 import forecast.Simulator;
 
@@ -12,6 +15,10 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		
 		float timeForCreation=80000;
+		AidaView view = new AidaView();
+		Manager model = new Manager();
+		AidaController controller = new AidaController(model, view);
+		
 		
 		/* --- START of 1st part code --- */
 		System.out.println("----------------------- 1st PART output -----------------------");
