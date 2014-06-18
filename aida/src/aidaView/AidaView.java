@@ -92,7 +92,7 @@ public class AidaView {
 		frmAidaAutomatic = new JFrame();
 		frmAidaAutomatic.setIconImage(Toolkit.getDefaultToolkit().getImage(AidaView.class.getResource("polimi.png")));
 		frmAidaAutomatic.setTitle("AIDA - Automatic Index extraction with Data Mining tool");
-		frmAidaAutomatic.setBounds(100, 100, 800, 600);
+		frmAidaAutomatic.setBounds(180, 50, 900, 650);
 		frmAidaAutomatic.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmAidaAutomatic.getContentPane().setLayout(new GridLayout(1, 0, 0, 0));
 		
@@ -220,7 +220,7 @@ public class AidaView {
         outputTextArea = new JTextArea();
         outputTextArea.setEditable(false);
         outputPanel.add(outputTextArea);
-        outputScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        outputScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         trainingPanel.add(outputScrollPanel);
         
         btnStart = new JButton("START");
@@ -299,7 +299,7 @@ public class AidaView {
     }
     
     public void printTrainingOutput(String s){
-    	outputTextArea.setText(s);
+    	outputTextArea.append(s+"\n");
     }
     
     public List<String> getInputParameter(){
@@ -321,7 +321,7 @@ public class AidaView {
 				return null;
 			}
 		//QUI l'output della prima parte!
-		outputTextArea.setText(inputLog+"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+inputLog);
+		//outputTextArea.setText(inputLog+"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+inputLog);
 		tabbedPane.setEnabledAt(1, true);
 		
     	List<String> in = new ArrayList<String>();

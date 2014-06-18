@@ -243,4 +243,20 @@ public class Manager {
 		System.out.println("Sequential Pattern parsing done\n");
 		return spList;
 	  }
+	  
+	  /**
+	   * Getter method for Association map between string query and integer key associated
+	   * @return the association map
+	   */
+	  public Map<String, Integer> getAssociationMap(){
+		  return association;
+	  }
+	  
+	  /**
+	   * Getter method for chunck map of the corresponding input log
+	   * @return the chunck map
+	   */
+	  public Map<Integer, List<Integer>> getChunckMap(){
+		  return queryMap;
+	  }
 }
