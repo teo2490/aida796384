@@ -1,10 +1,8 @@
-package aidaModel;
+package aidaController;
 
 import java.util.List;
 
-import aidaController.AidaController;
-import aidaController.Listener;
-import aidaController.Simulator;
+import aidaModel.Manager;
 import aidaView.AidaView;
 
 
