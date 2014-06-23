@@ -1,4 +1,4 @@
-package aida;
+package aidaModel;
 
 import java.util.ArrayList;
 import java.util.Date;

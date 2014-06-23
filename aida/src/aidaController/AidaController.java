@@ -9,8 +9,8 @@ import exception.InvalidSequentialPatternException;
 
 import prefixspan.MainTestPrefixSpan_saveToFile;
 
-import aida.Manager;
-import aida.SequentialPattern;
+import aidaModel.Manager;
+import aidaModel.SequentialPattern;
 import aidaView.AidaView;
 
 public class AidaController {

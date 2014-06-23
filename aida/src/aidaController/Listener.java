@@ -5,7 +5,7 @@ import java.util.List;
 
 import exception.InvalidSequentialPatternException;
 
-import aida.SequentialPattern;
+import aidaModel.SequentialPattern;
 import aidaView.AidaView;
 
 /**

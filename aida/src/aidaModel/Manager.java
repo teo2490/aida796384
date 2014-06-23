@@ -1,4 +1,4 @@
-package aida;
+package aidaModel;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
