@@ -6,13 +6,31 @@ import java.util.List;
 
 import exception.InvalidSequentialPatternException;
 
-/**
- * This class is the object that stands for a sequential pattern. It has a list of node (element of the sequential pattern) and a
+
+/*** 
+ * This class is the object that stands for a sequential pattern. 
+ * It has a list of node (element of the sequential pattern) and a
  * list of edges (the object between nodes).
- * 
- * @author Matteo Simoni 796384
  *
+ * Copyright (c) 2014 Matteo Simoni 796384
+ * 
+ * This file is part of the AIDA SOFTWARE
+ * (https://code.google.com/p/aida796384/).
+ *
+ * AIDA is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AIDA is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AIDA.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 public class SequentialPattern {
 
 	//It contains the id of the query

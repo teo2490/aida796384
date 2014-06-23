@@ -15,7 +15,7 @@ import java.util.Map;
 
 import exception.InvalidSequentialPatternException;
 
-/**
+/*** 
  * This class is responsible of managing files, conversion beetween queries and their ID, managing Sequential Pattern and so on..
  *  
  * Moreover this class keeps an Arraylist of the query and an ArrayList of the timestamp. (At position 32 of timestampList there is
@@ -23,11 +23,26 @@ import exception.InvalidSequentialPatternException;
  * 
  * When the propedeutical phase is done, this class call the algorithm for finding sequential pattern (it writes the pattern in
  * a file) and then call the ReadSP class that parse the TXT output file written by the algorithm.
- * 
- * @author Matteo Simoni 796384
  *
+ * Copyright (c) 2014 Matteo Simoni 796384
+ * 
+ * This file is part of the AIDA SOFTWARE
+ * (https://code.google.com/p/aida796384/).
+ *
+ * AIDA is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AIDA is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AIDA.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 public class Manager {
 	
 	//Keeps the association between the text of the query and its ID

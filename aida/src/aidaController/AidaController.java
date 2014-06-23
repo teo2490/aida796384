@@ -13,6 +13,29 @@ import aidaModel.Manager;
 import aidaModel.SequentialPattern;
 import aidaView.AidaView;
 
+
+/*** 
+ * This class is the controller of the application. It make it works.
+ *
+ * Copyright (c) 2014 Matteo Simoni 796384
+ * 
+ * This file is part of the AIDA SOFTWARE
+ * (https://code.google.com/p/aida796384/).
+ *
+ * AIDA is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * AIDA is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with AIDA.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 public class AidaController {
 	AidaView view;
 	private Manager model;
