@@ -22,13 +22,19 @@ public class MainTestPrefixSpan_saveToFile {
 		// print the database to console
 		sequenceDatabase.print();
 		
+		
+		
 		// Create an instance of the algorithm with minsup = 50 %
 		AlgoPrefixSpan algo = new AlgoPrefixSpan(); 
 		
-		int minsup = 2; // we use a minimum support of 2 sequences.
+		//int minsup = 2; // we use a minimum support of 2 sequences.
+		//calculating  number of sequences in which the sp has to appear, based on the support
+		double minsup = Double.parseDouble(args[2]);
+		int sup = (int) Math.ceil(minsup*sequenceDatabase.size());
 		
 		// execute the algorithm
-		algo.runAlgorithm(sequenceDatabase, outputPath, minsup);    
+		//algo.runAlgorithm(sequenceDatabase, minsup, outputPath);    
+		algo.runAlgorithm(sequenceDatabase, outputPath, sup);   
 		algo.printStatistics(sequenceDatabase.size());
 	}
 	

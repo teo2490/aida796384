@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Map;
 
+import exception.InvalidSequentialPatternException;
+
 import prefixspan.MainTestPrefixSpan_saveToFile;
 
 import aida.Manager;
@@ -12,17 +14,21 @@ import aida.SequentialPattern;
 import aidaView.AidaView;
 
 public class AidaController {
-	private AidaView view;
+	AidaView view;
 	private Manager model;
 	
-	private	float inSup;
+	private	double inSup;
 	private int inTime;
 	
 	private List<SequentialPattern> sp;
 	
+	private boolean running;
+	private Thread t;
+	
 	public AidaController(Manager m, AidaView v){
 		this.view = v;
 		this.model = m;
+		this.running=false;
 
 		//This listener starts the TRAINING phase when the START button is clicked
 		view.getStartBtn().addActionListener(new ActionListener() {
@@ -46,8 +52,40 @@ public class AidaController {
         		view.printTrainingOutput("READY FOR FORECASTING PHASE! Change Tab.");
         	}
         });
+		
+		view.getStartFlowBtn().addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		running=true;
+        		try {
+					forecasting();
+				} catch (InterruptedException
+						| InvalidSequentialPatternException e) {
+					e.printStackTrace();
+				}
+        	}
+        });
+		
+		view.getPauseFlowBtn().addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		running=false;
+        	}
+        });
+		
+		view.getStopFlowBtn().addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		running=false;
+        		view.clearForecastingQueries();
+        		view.clearForecastingOutput();
+        	}
+        });
 	}
 	
+	/**
+	 * This method manages the training phase
+	 * 
+	 * @param inLog	The path of the input log
+	 * @throws Exception
+	 */
 	public void training(String inLog) throws Exception{
 		view.printTrainingOutput("----------------------- Training Part output -----------------------");
 		
@@ -72,9 +110,10 @@ public class AidaController {
 		
 		// Launching PrefixSpan Algorithm..
 		view.printTrainingOutput("\nLaunching PrefixSpan Algorithm..\n");
-		String[] arg = new String[2];
+		String[] arg = new String[3];
 		arg[0]="C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan.txt";
 		arg[1]="C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan.txt";
+		arg[2]=Double.toString(inSup);
 		MainTestPrefixSpan_saveToFile.main(arg);
 		view.printTrainingOutput("Sequential pattern search done.\n");
 		
@@ -92,8 +131,43 @@ public class AidaController {
 		}
 	}
 	
-	public void forecasting(){
+	public void forecasting() throws InterruptedException, InvalidSequentialPatternException{
+//		Simulator initiater = new Simulator(5);
+//		Listener r1 = new Listener(sp, inTime);
+//
+//		initiater.addListener(r1);
+//
+//		System.out.println("\nSTARTING EXECUTION!\n");
+//  
+//		for(int i=0; i<10; i++){
+//			//Long pausing time in order to make some partial so invalid due to time constraint
+//			if(i==6)	Thread.sleep(120000);
+//			initiater.makeQuery();
+//		}
+//		//Used in place of the for-block for ad-hoc testin purposes
+//		initiater.makeQuery();
+		final Simulator initiater = new Simulator(5, view);
+		Listener r1 = new Listener(sp, inTime, view);
+
+		initiater.addListener(r1);
 		
+		view.printForecastingQueries("\nSTARTING EXECUTION!\n");
+		
+		t = new Thread(){
+			public void run(){
+				int q = -1;
+				while(running){
+					try {
+						Thread.sleep(1000);
+						q = initiater.makeQuery();
+					} catch (InterruptedException | InvalidSequentialPatternException e) {
+						e.printStackTrace();
+					}
+					view.printForecastingQueries("Query "+q+" executed! @ "+System.nanoTime());
+				}
+			}
+		};
+		t.start();
 	}
 
 }

@@ -2,6 +2,7 @@ package aidaView;
 
 import java.awt.EventQueue;
 
+import javax.print.attribute.standard.MediaSize.Other;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -45,6 +46,11 @@ public class AidaView {
 	private JTextArea outputTextArea;
 	private JButton btnStart;
 	private JLabel errorLabel;
+	private JTextArea flowingQueriesArea;
+	private JButton startFlowBtn;
+	private JButton pauseFlowBtn;
+	private JButton stopFlowBtn;
+	private JTextArea outputForecast;
 	
 	private String inputLog;
 	private String inputTime;
@@ -90,7 +96,7 @@ public class AidaView {
 	 */
 	private void initialize() {
 		frmAidaAutomatic = new JFrame();
-		frmAidaAutomatic.setIconImage(Toolkit.getDefaultToolkit().getImage(AidaView.class.getResource("polimi.png")));
+		frmAidaAutomatic.setIconImage(Toolkit.getDefaultToolkit().getImage(AidaView.class.getResource("aida_39.png")));
 		frmAidaAutomatic.setTitle("AIDA - Automatic Index extraction with Data Mining tool");
 		frmAidaAutomatic.setBounds(180, 50, 900, 650);
 		frmAidaAutomatic.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -99,7 +105,7 @@ public class AidaView {
 		 tabbedPane = new JTabbedPane();
 		 frmAidaAutomatic.getContentPane().add(tabbedPane);
 		 
-		 ImageIcon icon = createImageIcon("polimi.png");
+		 ImageIcon icon = createImageIcon("aida_39.png");
 	        
 	        //Creating and adding first tab
 	        JComponent panel1 = makeTrainingPanel();
@@ -140,6 +146,7 @@ public class AidaView {
         		inputLogText.setText("");
         		inputTimeText.setText("");
         		inputSupText.setText("");
+        		outputTextArea.setText("");
         	}
         });
         btnReset.setBounds(54, 244, 89, 23);
@@ -255,10 +262,6 @@ public class AidaView {
         //trainingPanel.add(panel);
         return trainingPanel;
     }
-	
-	public JButton getStartBtn(){
-		return btnStart;
-	}
     
     protected JComponent makeForecastingPanel() {
     	GridLayout gl_forecastingPanel = new GridLayout(1, 2, 10, 10);
@@ -270,26 +273,29 @@ public class AidaView {
         forecastingPanel.add(flowingPanel);
         flowingPanel.setLayout(new BorderLayout(5, 5));
         
-        JButton startFlowBtn = new JButton("START FLOW");
+        startFlowBtn = new JButton("START FLOW");
         flowingPanel.add(startFlowBtn, BorderLayout.WEST);
         
-        JButton pauseFlowBtn = new JButton("PAUSE FLOW");
+        pauseFlowBtn = new JButton("PAUSE FLOW");
         flowingPanel.add(pauseFlowBtn, BorderLayout.CENTER);
         
-        JButton stopFlowBtn = new JButton("STOP FLOW");
+        stopFlowBtn = new JButton("STOP FLOW");
         flowingPanel.add(stopFlowBtn, BorderLayout.EAST);
         
-        JTextArea flowingQueriesArea = new JTextArea();
+        flowingQueriesArea = new JTextArea();
         flowingQueriesArea.setEditable(false);
         flowingQueriesArea.setRows(15);
         flowingQueriesArea.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         flowingPanel.add(flowingQueriesArea, BorderLayout.NORTH);
         
-        JTextArea outputForecast = new JTextArea();
+        outputForecast = new JTextArea();
         outputForecast.setEditable(false);
         outputForecast.setRows(12);
         outputForecast.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-        flowingPanel.add(outputForecast, BorderLayout.SOUTH);
+        
+        JScrollPane outputAreaPanel = new JScrollPane(outputForecast);
+        outputAreaPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        flowingPanel.add(outputAreaPanel, BorderLayout.SOUTH);
         
         JPanel currentSpPanel = new JPanel();
         currentSpPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
@@ -298,8 +304,40 @@ public class AidaView {
         return forecastingPanel;
     }
     
+    public JButton getStartBtn(){
+		return btnStart;
+	}
+    
+    public JButton getStartFlowBtn(){
+		return startFlowBtn;
+	}
+    
+    public JButton getPauseFlowBtn(){
+		return pauseFlowBtn;
+	}
+    
+    public JButton getStopFlowBtn(){
+		return stopFlowBtn;
+	}
+    
     public void printTrainingOutput(String s){
     	outputTextArea.append(s+"\n");
+    }
+    
+    public void printForecastingQueries(String s){
+    	flowingQueriesArea.append(s+"\n");
+    }
+    
+    public void printForecastingResponse(String s){
+    	outputForecast.append(s+"\n");
+    }
+    
+    public void clearForecastingQueries(){
+    	flowingQueriesArea.setText("");
+    }
+    
+    public void clearForecastingOutput(){
+    	outputForecast.setText("");
     }
     
     public List<String> getInputParameter(){
@@ -307,7 +345,7 @@ public class AidaView {
     	inputLog = inputLogText.getText();
 		inputTime = inputTimeText.getText();
 		inputSup = inputSupText.getText();
-		float inSup;
+		double inSup;
 		//int inTime; Non usato in controlli
 		
 		errorLabel.setText("");
