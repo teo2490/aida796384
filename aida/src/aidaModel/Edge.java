@@ -86,16 +86,31 @@ public class Edge {
 			for(int i=0; i<instancesDuration.size();i++){
 					middle=middle+instancesDuration.get(i);
 				}
-			middle=middle/instancesDuration.size();
-			duration = middle;
+			duration=middle/instancesDuration.size();
+			//duration = middle;
 			
 			//Computing Variance
-			for (int j=0; j<instancesDuration.size() ; j++) 
-	        {
-	            sumsq = sumsq + ((instancesDuration.get(j)-middle) * ((instancesDuration.get(j)-middle)));
+//			for(int j=0; j<instancesDuration.size() ; j++){
+//	            //sumsq = sumsq + ((instancesDuration.get(j)-middle) * ((instancesDuration.get(j)-middle)));
+//	            sumsq = sumsq + ((instancesDuration.get(j)) * ((instancesDuration.get(j))));
+//	        }
+//	        v = (float) (sumsq / instancesDuration.size()) - (middle / instancesDuration.size());
+//	        variance=v;
+	        
+	        long min=(long)duration;
+	        long max=0;
+	        for(int j=0; j<instancesDuration.size() ; j++){
+	        	if(instancesDuration.get(j)<min)	min=instancesDuration.get(j);
+	        	else if(instancesDuration.get(j)<max)	max=instancesDuration.get(j);
 	        }
-	        v = (float) sumsq / instancesDuration.size();
-	        variance=v;
+	        
+	        float diff1=duration- (float) min;
+	        float diff2=(float)max-duration;
+	        
+	        if(diff1>diff2)	variance=diff1;
+	        else	variance=diff2;
+	        
+	        
 		}
 	}
 	

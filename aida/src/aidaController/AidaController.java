@@ -182,11 +182,13 @@ public class AidaController {
 				while(running){
 					try {
 						Thread.sleep(1000);
-						q = initiater.makeQuery();
+						if(running){
+							q = initiater.makeQuery();
+							view.printForecastingQueries("Query "+q+" executed! @ "+System.nanoTime());
+						}
 					} catch (InterruptedException | InvalidSequentialPatternException e) {
 						e.printStackTrace();
 					}
-					view.printForecastingQueries("Query "+q+" executed! @ "+System.nanoTime());
 				}
 			}
 		};

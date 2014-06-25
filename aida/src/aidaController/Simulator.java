@@ -74,7 +74,6 @@ public class Simulator {
     	if(randomInt==0)	randomInt=randomInt+1;
     	
         //System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
-    	System.out.println(view);
         // Notify everybody that may be interested.
         for (QueryListener hl : listeners){
         	hl.someoneMadeQuery(randomInt);

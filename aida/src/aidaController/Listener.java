@@ -164,7 +164,8 @@ public class Listener implements QueryListener  {
 	 */
 	public boolean checkValidity(SequentialPattern s, long t){
 		if(s.getLastCheck()==0)	return true;	//If it is the first node of a sp, return true
-		else if(t<s.getLastCheck()+s.getDuration(s.getNextNodeToCheck()-1)/*+s.getVariance(s.getNextNodeToCheck()-1)*/)	return true;
+		//else if(t<s.getLastCheck()+s.getDuration(s.getNextNodeToCheck()-1)/*+s.getVariance(s.getNextNodeToCheck()-1)*/)	return true;
+		else if(t<s.getLastCheck()+s.getDuration(s.getNextNodeToCheck()-1)+s.getVariance(s.getNextNodeToCheck()-1))	return true;
 		return false;
 		//AT THE STATE OF ART, WE ARE NOT CONSIDERING VARIANCE !!
 	}
