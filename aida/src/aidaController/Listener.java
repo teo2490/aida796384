@@ -99,11 +99,10 @@ public class Listener implements QueryListener  {
 		        				//System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
 		        				//ret.add("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
 		        				view.printForecastingResponse("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
+		        				//view.validateSpInList(spOnGoing.size()-1); AAAAAAAAAAAAAAAAAAAAAAAAa
 		        				sp.get(pos).schedule();
 		        			}
-		        			//Updated both the sp list of the controller and the sp list of the view
 			        		spOnGoing.remove(spOnGoing.size()-1);
-			        		view.removeSpFromList(spOnGoing.size()-1);
 		        		}
 		        	} else {
 		        		//If the partial sequential pattern is not valid anymore due to time constraint
@@ -137,6 +136,7 @@ public class Listener implements QueryListener  {
         			//if the indexes for the current sp are not implemented, it schedule its implementation
         			if(sp.get(pos).isScheduled()==false){
         				view.printForecastingResponse("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
+        				//view.validateSpInList(spOnGoing.size()-1); AAAAAAAAAAAAAAAAAAAAAA
         				sp.get(pos).schedule();
         			}
         		}

@@ -385,6 +385,32 @@ public class AidaView {
         return cc;
     }
     
+    protected ConnectorContainer addScheduled(SequentialPattern i){
+    	JConnector[] connectors = new JConnector[i.getNumberOfEdges()];
+    	ConnectorContainer cc = new ConnectorContainer(connectors);
+        cc.setLayout(null);
+        //cc.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JLabel[] b2 = new JLabel[i.getNumberOfNodes()];
+        b2[0]=new JLabel("  q"+i.getNode(0));
+        b2[0].setBounds(0, 10, 30, 30);
+        b2[0].setBorder(new EtchedBorder());
+        b2[0].setOpaque(true);
+        b2[0].setBackground(Color.green);
+        cc.add(b2[0]);
+        for(int j=1; j<i.getNumberOfNodes(); j++){
+        	b2[j]=new JLabel("  q"+i.getNode(j));
+            b2[j].setBounds(50*(j), 10, 30, 30);
+            b2[j].setBorder(new EtchedBorder());
+        	b2[j].setOpaque(true);
+            b2[j].setBackground(Color.green);
+        	connectors[j-1] = new JConnector(b2[j-1], b2[j], ConnectLine.LINE_ARROW_NONE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
+        	cc.add(b2[j]);
+        }
+        cc.setLabels(b2);
+        cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+        return cc;
+    }
+    
     public JButton getStartBtn(){
 		return btnStart;
 	}
@@ -438,6 +464,16 @@ public class AidaView {
     public void removeSpFromList(int pos){
     	currentSpPanel.remove(pos);
     	spOnGoingView.remove(pos);
+    	currentSpPanel.revalidate();
+    	currentSpPanel.repaint();
+    }
+    
+    public void validateSpInList(int pos){
+    	currentSpPanel.remove(pos);
+    	currentSpPanel.add(addScheduled(spOnGoingView.get(pos)));
+    	spOnGoingView.remove(pos);
+    	currentSpPanel.revalidate();
+    	currentSpPanel.repaint();
     }
     
     public List<String> getInputParameter(){
