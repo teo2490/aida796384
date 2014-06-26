@@ -79,8 +79,8 @@ public class Edge {
 	 */
 	public void computeDurationAndVariance(){
 		float middle = 0;
-		float sumsq = 0;
-		float v;
+//		float sumsq = 0;
+//		float v;
 		if(instancesDuration.size()>0){
 			//Computing duration
 			for(int i=0; i<instancesDuration.size();i++){

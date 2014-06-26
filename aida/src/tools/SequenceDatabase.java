@@ -52,7 +52,7 @@ public class SequenceDatabase {
 			FileInputStream fin = new FileInputStream(new File(path));
 			myInput = new BufferedReader(new InputStreamReader(fin));
 			// for each line until the end of the file
-			int i=0;
+			//int i=0;
 			while ((thisLine = myInput.readLine()) != null) {
 				// if the line is not a comment, is not empty or is not other
 				// kind of metadata

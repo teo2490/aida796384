@@ -99,6 +99,7 @@ public class AidaController {
         		running=false;
         		view.clearForecastingQueries();
         		view.clearForecastingOutput();
+        		view.clearForecastingSpView();
         	}
         });
 	}

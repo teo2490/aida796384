@@ -33,6 +33,7 @@ public class Main {
 		//float timeForCreation=80000;
 		AidaView view = new AidaView();
 		Manager model = new Manager();
+		@SuppressWarnings("unused")
 		AidaController controller = new AidaController(model, view);
 		
 //		

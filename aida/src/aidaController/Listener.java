@@ -79,7 +79,10 @@ public class Listener implements QueryListener  {
 		        		SequentialPattern newSP = currentSp.cloneSP();
 		        		newSP.incrementNextNodeToCheck();
 		        		newSP.setLastCheck(time);
+		        		//Updated both the sp list of the controller and the sp list of the view
 		        		spOnGoing.add(newSP);
+		        		view.addSpToList(newSP);
+		        		
 		        		//If the remaining time of a sp (the sum of its remaining edges duration without considering the
 		        		//next edge to check) is lower than the time needed for index creation, it is removed from the list
 		        		//of partial sp and the index creation is scheduled
@@ -98,13 +101,17 @@ public class Listener implements QueryListener  {
 		        				view.printForecastingResponse("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
 		        				sp.get(pos).schedule();
 		        			}
+		        			//Updated both the sp list of the controller and the sp list of the view
 			        		spOnGoing.remove(spOnGoing.size()-1);
+			        		view.removeSpFromList(spOnGoing.size()-1);
 		        		}
 		        	} else {
 		        		//If the partial sequential pattern is not valid anymore due to time constraint
 		        		//System.out.println("Removed old sp for time constraint: "+currentSp.toString());
 		        		view.printForecastingResponse("Removed old sp for time constraint: "+currentSp.toString());
+		        		//Updated both the sp list of the controller and the sp list of the view
 		        		spOnGoing.remove(j);
+		        		view.removeSpFromList(j);
 		        	}
 	        	} 
 	        }
@@ -113,7 +120,9 @@ public class Listener implements QueryListener  {
         //It checks the original list.
         for(int i=0;i<sp.size();i++){
         	if(sp.get(i).getNode(0) == q){
+        		//Updated both the sp list of the controller and the sp list of the view
         		spOnGoing.add(sp.get(i));
+        		view.addSpToList(sp.get(i));
         		
         		//Increment and decrement (before the end of the if-block the next node to check in order to make the
         		//getRemainingTime() function work.
@@ -178,11 +187,11 @@ public class Listener implements QueryListener  {
 	 * @param s	The completed sequential pattern (except for the time-expensive query)
 	 * @return	The time to wait before indexes creation
 	 */
-	private long timeForIndexCreation(SequentialPattern s){
+	/*private long timeForIndexCreation(SequentialPattern s){
 		float floatWaitTime = s.getDuration(s.getNumberOfEdges()-1) - s.getVariance(s.getNumberOfEdges()-1);
 		long waitTime = (long) floatWaitTime;
 		if(waitTime<0)	waitTime=0;
 		
 		return waitTime;
-	}
+	}*/
 }

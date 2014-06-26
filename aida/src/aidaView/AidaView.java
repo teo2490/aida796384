@@ -11,6 +11,7 @@ import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+
 import javax.swing.JPanel;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -18,6 +19,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JLabel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.DefaultCaret;
 import javax.swing.JTextField;
 import java.awt.Font;
 import java.awt.event.ActionListener;
@@ -29,10 +31,16 @@ import java.util.List;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextArea;
+
+import exception.InvalidSequentialPatternException;
+
+import aidaModel.SequentialPattern;
+import aidaView.sequentialPatternView.ConnectorContainer;
+import aidaView.sequentialPatternView.JConnector;
+import aidaView.sequentialPatternView.ConnectLine;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.FlowLayout;
-import java.awt.Rectangle;
 
 
 /*** 
@@ -78,6 +86,11 @@ public class AidaView {
 	private String inputLog;
 	private String inputTime;
 	private String inputSup;
+	
+	private JPanel currentSpPanel;	
+	static ConnectorContainer cc;
+	
+	private List<SequentialPattern> spOnGoingView;
 
 	/**
 	 * Launch the application.
@@ -97,8 +110,10 @@ public class AidaView {
 
 	/**
 	 * Create the application.
+	 * @throws InvalidSequentialPatternException 
 	 */
-	public AidaView() {
+	public AidaView() throws InvalidSequentialPatternException {
+		spOnGoingView = new ArrayList<SequentialPattern>();
 		initialize();
 		frmAidaAutomatic.setVisible(true);
 	}
@@ -116,8 +131,9 @@ public class AidaView {
     
 	/**
 	 * Initialize the contents of the frame.
+	 * @throws InvalidSequentialPatternException 
 	 */
-	private void initialize() {
+	private void initialize() throws InvalidSequentialPatternException {
 		frmAidaAutomatic = new JFrame();
 		frmAidaAutomatic.setIconImage(Toolkit.getDefaultToolkit().getImage(AidaView.class.getResource("aida_39.png")));
 		frmAidaAutomatic.setTitle("AIDA - Automatic Index extraction with Data Mining tool");
@@ -286,7 +302,7 @@ public class AidaView {
         return trainingPanel;
     }
     
-    protected JComponent makeForecastingPanel() {
+    protected JComponent makeForecastingPanel() throws InvalidSequentialPatternException {
     	GridLayout gl_forecastingPanel = new GridLayout(1, 2, 10, 10);
         JPanel forecastingPanel = new JPanel(false);
         forecastingPanel.setLayout(gl_forecastingPanel);
@@ -309,22 +325,64 @@ public class AidaView {
         flowingQueriesArea.setEditable(false);
         flowingQueriesArea.setRows(15);
         flowingQueriesArea.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-        flowingPanel.add(flowingQueriesArea, BorderLayout.NORTH);
+        DefaultCaret caret = (DefaultCaret)flowingQueriesArea.getCaret();  
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        JScrollPane fqPanel = new JScrollPane(flowingQueriesArea);
+        fqPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        flowingPanel.add(fqPanel, BorderLayout.NORTH);
         
         outputForecast = new JTextArea();
         outputForecast.setEditable(false);
         outputForecast.setRows(12);
         outputForecast.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+        DefaultCaret caret1 = (DefaultCaret)outputForecast.getCaret();  
+        caret1.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         
         JScrollPane outputAreaPanel = new JScrollPane(outputForecast);
         outputAreaPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         flowingPanel.add(outputAreaPanel, BorderLayout.SOUTH);
         
-        JPanel currentSpPanel = new JPanel();
+        currentSpPanel = new JPanel();
         currentSpPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-        forecastingPanel.add(currentSpPanel);
-        currentSpPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        currentSpPanel.setLayout(new GridLayout(16, 1));
+        JScrollPane cspPanel = new JScrollPane(currentSpPanel);
+        cspPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        forecastingPanel.add(cspPanel);
+        
         return forecastingPanel;
+    }
+    
+    /**
+     * This method creates a visual view of a Sequential Pattern and show it
+     * @param i	The Sequential Pattern that has to be visualized
+     * @return
+     */
+    protected ConnectorContainer initSp(SequentialPattern i){
+    	JConnector[] connectors = new JConnector[i.getNumberOfEdges()];
+    	ConnectorContainer cc = new ConnectorContainer(connectors);
+        cc.setLayout(null);
+        //cc.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JLabel[] b2 = new JLabel[i.getNumberOfNodes()];
+        b2[0]=new JLabel("  q"+i.getNode(0));
+        b2[0].setBounds(0, 10, 30, 30);
+        b2[0].setBorder(new EtchedBorder());
+        b2[0].setOpaque(true);
+        b2[0].setBackground(Color.red);
+        cc.add(b2[0]);
+        for(int j=1; j<i.getNumberOfNodes(); j++){
+        	b2[j]=new JLabel("  q"+i.getNode(j));
+            b2[j].setBounds(50*(j), 10, 30, 30);
+            b2[j].setBorder(new EtchedBorder());
+            if(j<i.getNextNodeToCheck()){
+            	b2[j].setOpaque(true);
+                b2[j].setBackground(Color.red);
+            }
+        	connectors[j-1] = new JConnector(b2[j-1], b2[j], ConnectLine.LINE_ARROW_NONE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
+        	cc.add(b2[j]);
+        }
+        cc.setLabels(b2);
+        cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+        return cc;
     }
     
     public JButton getStartBtn(){
@@ -361,6 +419,25 @@ public class AidaView {
     
     public void clearForecastingOutput(){
     	outputForecast.setText("");
+    }
+    
+    public void clearForecastingSpView(){
+    	spOnGoingView.removeAll(spOnGoingView);
+    	currentSpPanel.removeAll();
+    	currentSpPanel.revalidate();
+    	currentSpPanel.repaint();
+    }
+    
+    public void addSpToList(SequentialPattern sp){
+    	spOnGoingView.add(sp);
+    	currentSpPanel.add(initSp(sp));
+    	currentSpPanel.revalidate();
+    	currentSpPanel.repaint();
+    }
+    
+    public void removeSpFromList(int pos){
+    	currentSpPanel.remove(pos);
+    	spOnGoingView.remove(pos);
     }
     
     public List<String> getInputParameter(){
