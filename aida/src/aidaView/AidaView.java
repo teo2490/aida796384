@@ -24,7 +24,11 @@ import javax.swing.JTextField;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +38,7 @@ import javax.swing.JTextArea;
 
 import exception.InvalidSequentialPatternException;
 
+import aidaModel.Manager;
 import aidaModel.SequentialPattern;
 import aidaView.sequentialPatternView.ConnectorContainer;
 import aidaView.sequentialPatternView.JConnector;
@@ -41,6 +46,7 @@ import aidaView.sequentialPatternView.ConnectLine;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JComboBox;
 
 
 /*** 
@@ -87,7 +93,11 @@ public class AidaView {
 	private String inputTime;
 	private String inputSup;
 	
-	private JPanel currentSpPanel;	
+	private JComboBox queryMenu;
+	private JPanel inputPanel;
+	
+	private JPanel currentSpPanel;
+	private JScrollPane cspPanel;
 	static ConnectorContainer cc;
 	
 	private List<SequentialPattern> spOnGoingView;
@@ -174,7 +184,7 @@ public class AidaView {
                 "TXT & CSV files", "txt", "csv");
         fc.setFileFilter(filter);
         
-        JPanel inputPanel = new JPanel();
+        inputPanel = new JPanel();
         inputPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         trainingPanel.add(inputPanel);
         inputPanel.setLayout(null);
@@ -188,7 +198,7 @@ public class AidaView {
         		outputTextArea.setText("");
         	}
         });
-        btnReset.setBounds(54, 244, 89, 23);
+        btnReset.setBounds(54, 383, 89, 23);
         inputPanel.add(btnReset);
         
         inputLogText = new JTextField();
@@ -201,6 +211,35 @@ public class AidaView {
                     File file = fc.getSelectedFile();
                     String s = file.getAbsolutePath();
                     inputLogText.setText(s);
+                    inputTimeText.setEnabled(true);
+                    inputSupText.setEnabled(true);
+                    btnStart.setEnabled(true);
+                    
+                    ArrayList<String> m = new ArrayList<String>();
+        			BufferedReader br = null;
+					try {
+						br = new BufferedReader(new FileReader(file));
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+        			String line = "";
+        			String cvsSplitBy = ", ";
+        			int i=0;
+					try {
+						while ((line = br.readLine()) != null) {        				
+							// use comma as separator
+							String[] token = line.split(cvsSplitBy);
+							if(!m.contains(token[1]))	m.add(token[1]);
+							i++;
+						}
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+                    queryMenu = new JComboBox(m.toArray());
+                    queryMenu.setBounds(20, 183, 400, 20);
+                    inputPanel.add(queryMenu);
                 }
         	}
         });
@@ -229,20 +268,22 @@ public class AidaView {
         inputPanel.add(lblInputLogFile);
         
         inputTimeText = new JTextField();
-        inputTimeText.setBounds(10, 133, 189, 20);
+        inputTimeText.setEnabled(false);
+        inputTimeText.setBounds(54, 232, 150, 20);
         inputPanel.add(inputTimeText);
         inputTimeText.setColumns(10);
         
-        JLabel lblTimeForIndex = new JLabel("Time for Index implementation (in ms)");
-        lblTimeForIndex.setBounds(10, 115, 222, 14);
+        JLabel lblTimeForIndex = new JLabel("Time (in ms)");
+        lblTimeForIndex.setBounds(95, 219, 76, 14);
         inputPanel.add(lblTimeForIndex);
         
-        JLabel lblMinimumSupport = new JLabel("Minimum Support (between 0 and 1)");
-        lblMinimumSupport.setBounds(10, 164, 210, 14);
+        JLabel lblMinimumSupport = new JLabel("Minimum Support");
+        lblMinimumSupport.setBounds(207, 219, 89, 14);
         inputPanel.add(lblMinimumSupport);
         
         inputSupText = new JTextField();
-        inputSupText.setBounds(10, 181, 189, 20);
+        inputSupText.setEnabled(false);
+        inputSupText.setBounds(229, 232, 50, 20);
         inputPanel.add(inputSupText);
         inputSupText.setColumns(10);
         
@@ -270,6 +311,7 @@ public class AidaView {
         trainingPanel.add(outputScrollPanel);
         
         btnStart = new JButton("START");
+        btnStart.setEnabled(false);
         /*btnStart.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		inputLog = inputLogText.getText();
@@ -295,8 +337,12 @@ public class AidaView {
         		}
         	}
         });*/
-        btnStart.setBounds(248, 244, 89, 23);
+        btnStart.setBounds(248, 383, 89, 23);
         inputPanel.add(btnStart);
+        
+        JLabel lblNewLabel = new JLabel("teQuery");
+        lblNewLabel.setBounds(64, 170, 46, 14);
+        inputPanel.add(lblNewLabel);
         
         //trainingPanel.add(panel);
         return trainingPanel;
@@ -345,7 +391,7 @@ public class AidaView {
         currentSpPanel = new JPanel();
         currentSpPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         currentSpPanel.setLayout(new GridLayout(16, 1));
-        JScrollPane cspPanel = new JScrollPane(currentSpPanel);
+        cspPanel = new JScrollPane(currentSpPanel);
         cspPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         forecastingPanel.add(cspPanel);
         
@@ -468,10 +514,11 @@ public class AidaView {
     	currentSpPanel.repaint();
     }
     
-    public void validateSpInList(int pos){
-    	currentSpPanel.remove(pos);
-    	currentSpPanel.add(addScheduled(spOnGoingView.get(pos)));
-    	spOnGoingView.remove(pos);
+    public void validateSpInList(SequentialPattern sp){
+    	spOnGoingView.add(sp);
+    	//currentSpPanel.remove(pos);
+    	currentSpPanel.add(addScheduled(sp));
+    	//spOnGoingView.remove(pos);
     	currentSpPanel.revalidate();
     	currentSpPanel.repaint();
     }

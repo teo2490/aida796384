@@ -38,7 +38,7 @@ public class Listener implements QueryListener  {
 	//The list of the known sequential pattern
 	private List<SequentialPattern> sp;
 	//The list of the sequential pattern partially found in the flow of query
-	private List<SequentialPattern> spOnGoing = new ArrayList<SequentialPattern>();
+	private List<SequentialPattern> spOnGoing;
 	//The time required for index creation
 	private float timeForCreation;
 	
@@ -48,6 +48,7 @@ public class Listener implements QueryListener  {
 		this.sp=sp;
 		timeForCreation=t;
 		view=v;
+		spOnGoing = new ArrayList<SequentialPattern>();
 	}
 	
 	/**
@@ -67,80 +68,87 @@ public class Listener implements QueryListener  {
 		long time = System.currentTimeMillis();
 		int pos=-1;
 		
+		System.out.println("Someone MADES a QUERY an spOnGoing size is: "+spOnGoing.size());
+		
 		//It checks the partially recognized sequential pattern list.
         if(spOnGoing.size()>0){
 	        for(int j=0; j<spOnGoing.size();j++){
 	        	SequentialPattern currentSp = spOnGoing.get(j);
-	        	
+	        	System.out.println("1CHECK: "+(currentSp.getNextNodeToCheck() < currentSp.getNumberOfNodes()));
+	        	//System.out.println("2CHECK: "+(currentSp.getNode(currentSp.getNextNodeToCheck()) == q));
 	        	if(currentSp.getNextNodeToCheck() < currentSp.getNumberOfNodes() && currentSp.getNode(currentSp.getNextNodeToCheck()) == q){
+	        		System.out.println(currentSp.toString()+" SI");
+	        		currentSp.incrementNextNodeToCheck(); 
+	        		currentSp.setLastCheck(time);
+	        		System.out.println("CHECK: "+checkValidity(currentSp, time));
 	        		//If the queries is the next of a partial sp (that is yet valid due to time constraint), it is copied, 
 	        		//updated and added to the list of partial sp
-	        		if(checkValidity(currentSp, time)==true){
+	        		if(checkValidity(currentSp, time)==true && typeAlreadyScheduled(currentSp)==false){
+	        			System.out.println("DENTRO");
 		        		SequentialPattern newSP = currentSp.cloneSP();
-		        		newSP.incrementNextNodeToCheck();
-		        		newSP.setLastCheck(time);
-		        		//Updated both the sp list of the controller and the sp list of the view
+		        		//newSP.incrementNextNodeToCheck(); 
+		        		//newSP.setLastCheck(time);
 		        		spOnGoing.add(newSP);
-		        		view.addSpToList(newSP);
-		        		
+		        		System.out.println(newSP.toString()+" ADDED");
 		        		//If the remaining time of a sp (the sum of its remaining edges duration without considering the
 		        		//next edge to check) is lower than the time needed for index creation, it is removed from the list
 		        		//of partial sp and the index creation is scheduled
 		        		if(newSP.getRemainingTime()<=timeForCreation){
 		        			
-		        			//calculating the time to wait before scheduling index creation
-		        			//long waitTime=timeForIndexCreation(newSP); //??
-		        			
 		        			//finding the position of the current sp in the original sp list
 		        			pos = findPositionInSpList(newSP);
-		        			//Thread.sleep(waitTime*1000); //??
+		        			
 		        			//if the indexes for the current sp are not implemented, it schedule its implementation
-		        			if(sp.get(pos).isScheduled()==false){
-		        				//System.out.println("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
-		        				//ret.add("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
+		        			//if(sp.get(pos).isScheduled()==false){
 		        				view.printForecastingResponse("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
-		        				//view.validateSpInList(spOnGoing.size()-1); AAAAAAAAAAAAAAAAAAAAAAAAa
+		        				view.validateSpInList(spOnGoing.get(spOnGoing.size()-1));
 		        				sp.get(pos).schedule();
-		        			}
-			        		spOnGoing.remove(spOnGoing.size()-1);
+		        				//spOnGoing.get(spOnGoing.size()-1).schedule();
+		        			//}
+		        		} else {
+		        			//Updated both the sp list of the controller and the sp list of the view
+			        		spOnGoing.add(newSP);
+			        		view.addSpToList(newSP);
 		        		}
 		        	} else {
 		        		//If the partial sequential pattern is not valid anymore due to time constraint
-		        		//System.out.println("Removed old sp for time constraint: "+currentSp.toString());
-		        		view.printForecastingResponse("Removed old sp for time constraint: "+currentSp.toString());
-		        		//Updated both the sp list of the controller and the sp list of the view
-		        		spOnGoing.remove(j);
-		        		view.removeSpFromList(j);
+		        		if(typeAlreadyScheduled(currentSp)==false){
+			        		view.printForecastingResponse("Removed old sp for time constraint: "+currentSp.toString());//Updated both the sp list of the controller and the sp list of the view
+			        		spOnGoing.remove(j);
+			        		view.removeSpFromList(j);
+		        		} else {
+		        			//if(!currentSp.isScheduled()){
+		        				view.printForecastingResponse("Removed old sp because already scheduled: "+currentSp.toString());//Updated both the sp list of the controller and the sp list of the view
+				        		spOnGoing.remove(j);
+				        		view.removeSpFromList(j);
+		        			//}
+		        		}
 		        	}
-	        	} 
+	        	} else System.out.println(currentSp.toString()+" NO");
 	        }
         }
         
         //It checks the original list.
         for(int i=0;i<sp.size();i++){
-        	if(sp.get(i).getNode(0) == q){
+        	if(sp.get(i).getNode(0) == q && sp.get(i).isScheduled()==false){
         		//Updated both the sp list of the controller and the sp list of the view
         		spOnGoing.add(sp.get(i));
-        		view.addSpToList(sp.get(i));
-        		
-        		//Increment and decrement (before the end of the if-block the next node to check in order to make the
-        		//getRemainingTime() function work.
-        		spOnGoing.get(spOnGoing.size()-1).incrementNextNodeToCheck();
+        		System.out.println("SIZE: "+spOnGoing.size());
         		spOnGoing.get(spOnGoing.size()-1).setLastCheck(time);
-        		//If a sequential pattern is complete (except for the last node that is the teQuery), the index creation is scheduled
+        		//If yhe time needed to implement indexes is less then the remaining time of the sp, 
+        		//the index creation is scheduled
         		if(spOnGoing.get(spOnGoing.size()-1).getRemainingTime()<=timeForCreation){
-        			//long waitTime=timeForIndexCreation(spOnGoing.get(spOnGoing.size()-1)); //?
         			//finding the position of the current sp in the original sp list
         			pos = findPositionInSpList(spOnGoing.get(spOnGoing.size()-1));
-        			//Thread.sleep(waitTime*1000); //?
         			//if the indexes for the current sp are not implemented, it schedule its implementation
         			if(sp.get(pos).isScheduled()==false){
         				view.printForecastingResponse("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
-        				//view.validateSpInList(spOnGoing.size()-1); AAAAAAAAAAAAAAAAAAAAAA
+        				view.validateSpInList(spOnGoing.get(spOnGoing.size()-1)); 
         				sp.get(pos).schedule();
-        			}
-        		}
-        		spOnGoing.get(spOnGoing.size()-1).decrementNextNodeToCheck();
+        			} 
+        		} else {
+    				view.addSpToList(sp.get(i));
+    			}
         	}
         }
         view.printForecastingResponse("-------------------------");
@@ -162,6 +170,15 @@ public class Listener implements QueryListener  {
 		return -1;
 	}
 	
+	public boolean typeAlreadyScheduled(SequentialPattern s){
+		for(int i=0; i<sp.size(); i++){
+			if(sp.get(i).equals(s) && sp.get(i).isScheduled()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * This method checks the validity of a partial sequential pattern. 
 	 * If the elapsed time from the check of the last query and the check of a new one is greater than the duration of the edge 
@@ -172,11 +189,15 @@ public class Listener implements QueryListener  {
 	 * @return true if the sp is yet valid, false otherwise
 	 */
 	public boolean checkValidity(SequentialPattern s, long t){
+		long diff=t-s.getLastCheck();
+		System.out.println("VALIDITY: "+(s.getNextNodeToCheck()>=s.getNumberOfNodes()));
+		System.out.println("NEXT: "+s.getNextNodeToCheck());
+		if(s.getNextNodeToCheck()>=s.getNumberOfNodes())	return false;
 		if(s.getLastCheck()==0)	return true;	//If it is the first node of a sp, return true
-		//else if(t<s.getLastCheck()+s.getDuration(s.getNextNodeToCheck()-1)/*+s.getVariance(s.getNextNodeToCheck()-1)*/)	return true;
-		else if(t<s.getLastCheck()+s.getDuration(s.getNextNodeToCheck()-1)+s.getVariance(s.getNextNodeToCheck()-1))	return true;
+		else if(diff<s.getDuration(s.getNextNodeToCheck()-1)+s.getVariance(s.getNextNodeToCheck()-1))	return true;
+		//else if(t<s.getLastCheck()+s.getDuration(s.getNextNodeToCheck()-1)+/*s.getVariance(s.getNextNodeToCheck()-1)*/)	return true;
 		return false;
-		//AT THE STATE OF ART, WE ARE NOT CONSIDERING VARIANCE !!
+		//AT THE STATE OF ART, WE ARE CONSIDERING VARIANCE !! (That is not really variance, but max diff)
 	}
 	
 	

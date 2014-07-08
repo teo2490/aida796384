@@ -69,7 +69,7 @@ public class Simulator {
     	
     	int randomInt = randomGenerator.nextInt(seed);
     	
-    	Thread.sleep(randomInt*1000*2);
+    	//Thread.sleep(randomInt*1000*2);
     	
     	if(randomInt==0)	randomInt=randomInt+1;
     	
@@ -80,27 +80,34 @@ public class Simulator {
         }
         
         return randomInt;
-        /* Another body for makeQuery() function for ad-hoc testing purposes
+    	/*
+        //Another body for makeQuery() function for ad-hoc testing purposes
+    	for (QueryListener hl : listeners){
+    		System.out.println("Query 4 executed! @ "+System.nanoTime());
+    		hl.someoneMadeQuery(4);
+    	}
+    	//Thread.sleep(50000);
+    	for (QueryListener hl : listeners){
+    		System.out.println("Query 4 executed! @ "+System.nanoTime());
+    		hl.someoneMadeQuery(4);
+    	}
+    	//Thread.sleep(50000);
     	for (QueryListener hl : listeners){
     		System.out.println("Query 3 executed! @ "+System.nanoTime());
     		hl.someoneMadeQuery(3);
     	}
-    	Thread.sleep(50000);
+    	//Thread.sleep(50000);
     	for (QueryListener hl : listeners){
-    		System.out.println("Query 3 executed! @ "+System.nanoTime());
-    		hl.someoneMadeQuery(3);
+    		System.out.println("Query 4 executed! @ "+System.nanoTime());
+    		hl.someoneMadeQuery(4);
     	}
-    	Thread.sleep(50000);
+    	
     	for (QueryListener hl : listeners){
     		System.out.println("Query 1 executed! @ "+System.nanoTime());
     		hl.someoneMadeQuery(1);
     	}
-    	Thread.sleep(50000);
-    	for (QueryListener hl : listeners){
-    		System.out.println("Query 2 executed! @ "+System.nanoTime());
-    		hl.someoneMadeQuery(2);
-    	}
-    	*/    	
+    	return 4;
+    	*/
     }
 }
 
