@@ -2,6 +2,7 @@ package aidaController;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +41,8 @@ public class AidaController {
 	AidaView view;
 	private Manager model;
 	
-	private	double inSup;
-	private int inTime;
+	private List<Double> inSup;
+	private List<Integer> inTime;
 	
 	private List<SequentialPattern> sp;
 	
@@ -52,20 +53,24 @@ public class AidaController {
 		this.view = v;
 		this.model = m;
 		this.running=false;
+		
+		inSup = new ArrayList<Double>();
+		inTime = new ArrayList<Integer>();
 
 		//This listener starts the TRAINING phase when the START button is clicked
 		view.getStartBtn().addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		//Getting back parameter
-        		List<String> s = view.getInputParameter();
-        		if(s.get(0)!= null && s.get(1)!= null && s.get(2)!= null){
-	        		String inLog = s.get(0);
-	        		String inTimeSting = s.get(1);
-	        		String inSupString = s.get(2);
-	        		inSup = Float.parseFloat(inSupString);
-	        		inTime = Integer.parseInt(inTimeSting);
+        		String inLog = view.getInputLog();
+        		List<String> times = view.getInputTime();
+        		List<String> sups = view.getInputSup();
+        		if(inLog!= null && times!= null && sups!= null){
+	        		for(int i=0; i<times.size(); i++){
+	        			inSup.add(Double.parseDouble(sups.get(i)));
+	        			inTime.add(Integer.parseInt(times.get(i)));
+	        		}
 	        		try {
-	        			//Start the training
+	        			//Start the training ////////
 	        			training(inLog);
 					} catch (Exception e) {
 						e.printStackTrace();

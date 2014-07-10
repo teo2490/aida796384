@@ -69,7 +69,7 @@ public class Simulator {
     	
     	int randomInt = randomGenerator.nextInt(seed);
     	
-    	//Thread.sleep(randomInt*1000*2);
+    	Thread.sleep(randomInt*1000*2);
     	
     	if(randomInt==0)	randomInt=randomInt+1;
     	

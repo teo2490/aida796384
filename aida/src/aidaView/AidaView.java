@@ -2,6 +2,7 @@ package aidaView;
 
 import java.awt.EventQueue;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -10,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 
 import javax.swing.JPanel;
@@ -19,6 +21,8 @@ import java.awt.event.KeyEvent;
 import javax.swing.JLabel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultCaret;
 import javax.swing.JTextField;
 import java.awt.Font;
@@ -47,6 +51,16 @@ import aidaView.sequentialPatternView.ConnectLine;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JComboBox;
+import javax.swing.BoxLayout;
+import java.awt.Component;
+import javax.swing.SwingConstants;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.JTable;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.BevelBorder;
+import java.awt.FlowLayout;
 
 
 /*** 
@@ -75,8 +89,8 @@ public class AidaView {
 
 	private JFrame frmAidaAutomatic;
 	private JTextField inputLogText;
-	private JTextField inputTimeText;
-	private JTextField inputSupText;
+	private List<JTextField> inputTimeText;
+	private List<JTextField> inputSupText;
 	private JFileChooser fc;
 	private JTabbedPane tabbedPane;
 	private JPanel outputPanel;
@@ -90,10 +104,11 @@ public class AidaView {
 	private JTextArea outputForecast;
 	
 	private String inputLog;
-	private String inputTime;
-	private String inputSup;
+	private ArrayList<String> inputTime;
+	private ArrayList<String> inputSup;
+	private ArrayList<String> teQueries;
 	
-	private JComboBox queryMenu;
+	private ArrayList<JComboBox> queryMenu;
 	private JPanel inputPanel;
 	
 	private JPanel currentSpPanel;
@@ -101,7 +116,24 @@ public class AidaView {
 	static ConnectorContainer cc;
 	
 	private List<SequentialPattern> spOnGoingView;
-
+	private JPanel buttonPanel;
+	private JPanel inputFile;
+	private JPanel inputTeQuery;
+	private JPanel inputButton;
+	private JTable table;
+	private JScrollPane scrollPane;
+	private JButton addRowButton;
+	
+	private DefaultTableModel dtm;
+	private ArrayList<String> m;
+	private JLabel lblColumnNumQuery;
+	private JTextField numQueryText;
+	private JLabel lblColumnNumTimestamp;
+	private JTextField numTimestampText;
+	private JButton btnComputeInput;
+	
+	private File file;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -125,6 +157,7 @@ public class AidaView {
 	public AidaView() throws InvalidSequentialPatternException {
 		spOnGoingView = new ArrayList<SequentialPattern>();
 		initialize();
+		frmAidaAutomatic.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		frmAidaAutomatic.setVisible(true);
 	}
 
@@ -176,9 +209,14 @@ public class AidaView {
 	}
 	
 	protected JComponent makeTrainingPanel() {
+		inputSupText = new ArrayList<JTextField>();
+		inputTimeText = new ArrayList<JTextField>();
+		file = null;
+		
     	GridLayout gl_trainingPanel = new GridLayout(1, 2, 10, 10);
         JPanel trainingPanel = new JPanel(false);
         trainingPanel.setLayout(gl_trainingPanel);
+        
         fc = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "TXT & CSV files", "txt", "csv");
@@ -187,35 +225,109 @@ public class AidaView {
         inputPanel = new JPanel();
         inputPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         trainingPanel.add(inputPanel);
-        inputPanel.setLayout(null);
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
         
-        JButton btnReset = new JButton("RESET");
-        btnReset.addActionListener(new ActionListener() {
+        inputFile = new JPanel();
+        inputPanel.add(inputFile);
+        GridBagLayout gbl_inputFile = new GridBagLayout();
+        gbl_inputFile.columnWidths = new int[]{106, 80, 0, 0, 0};
+        gbl_inputFile.rowHeights = new int[]{33, 0, 0, 0, 0, 12, 0};
+        gbl_inputFile.columnWeights = new double[]{1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+        gbl_inputFile.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        inputFile.setLayout(gbl_inputFile);
+        
+        addRowButton = new JButton("Add Row");
+        addRowButton.setEnabled(false);
+        addRowButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
-        		inputLogText.setText("");
-        		inputTimeText.setText("");
-        		inputSupText.setText("");
-        		outputTextArea.setText("");
+
+        		JTextField t = new JTextField();
+                t.setColumns(10);
+                inputTimeText.add(t);
+                JTextField sup = new JTextField();
+                sup.setColumns(10);
+                inputSupText.add(sup);
+                
+                dtm.addRow(new Object[] { "Choose the teQuery..", 
+                		"", ""});
         	}
         });
-        btnReset.setBounds(54, 383, 89, 23);
-        inputPanel.add(btnReset);
         
-        inputLogText = new JTextField();
-        inputLogText.addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent arg0) {
+        JButton btnOpenLog = new JButton("");
+        GridBagConstraints gbc_btnOpenLog = new GridBagConstraints();
+        gbc_btnOpenLog.anchor = GridBagConstraints.EAST;
+        gbc_btnOpenLog.insets = new Insets(0, 0, 5, 5);
+        gbc_btnOpenLog.gridx = 2;
+        gbc_btnOpenLog.gridy = 1;
+        inputFile.add(btnOpenLog, gbc_btnOpenLog);
+        btnOpenLog.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
         		int returnVal = fc.showOpenDialog(frmAidaAutomatic);
-       		 
+        		 
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = fc.getSelectedFile();
+                    file = fc.getSelectedFile();
                     String s = file.getAbsolutePath();
                     inputLogText.setText(s);
-                    inputTimeText.setEnabled(true);
-                    inputSupText.setEnabled(true);
+                }
+            }
+        });
+        btnOpenLog.setIcon(new ImageIcon(AidaView.class.getResource("open.png")));
+        
+        lblColumnNumQuery = new JLabel("Column Num Query");
+        GridBagConstraints gbc_lblColumnNumQuery = new GridBagConstraints();
+        gbc_lblColumnNumQuery.anchor = GridBagConstraints.WEST;
+        gbc_lblColumnNumQuery.insets = new Insets(0, 5, 5, 5);
+        gbc_lblColumnNumQuery.gridx = 0;
+        gbc_lblColumnNumQuery.gridy = 2;
+        inputFile.add(lblColumnNumQuery, gbc_lblColumnNumQuery);
+        
+        numQueryText = new JTextField();
+        GridBagConstraints gbc_numQueryText = new GridBagConstraints();
+        gbc_numQueryText.anchor = GridBagConstraints.WEST;
+        gbc_numQueryText.insets = new Insets(0, 0, 5, 5);
+        gbc_numQueryText.gridx = 1;
+        gbc_numQueryText.gridy = 2;
+        inputFile.add(numQueryText, gbc_numQueryText);
+        numQueryText.setColumns(10);
+        
+        lblColumnNumTimestamp = new JLabel("Column Num Timestamp");
+        GridBagConstraints gbc_lblColumnNumTimestamp = new GridBagConstraints();
+        gbc_lblColumnNumTimestamp.anchor = GridBagConstraints.WEST;
+        gbc_lblColumnNumTimestamp.insets = new Insets(0, 5, 5, 5);
+        gbc_lblColumnNumTimestamp.gridx = 0;
+        gbc_lblColumnNumTimestamp.gridy = 3;
+        inputFile.add(lblColumnNumTimestamp, gbc_lblColumnNumTimestamp);
+        
+        numTimestampText = new JTextField();
+        GridBagConstraints gbc_numTimestampText = new GridBagConstraints();
+        gbc_numTimestampText.anchor = GridBagConstraints.WEST;
+        gbc_numTimestampText.insets = new Insets(0, 0, 5, 5);
+        gbc_numTimestampText.gridx = 1;
+        gbc_numTimestampText.gridy = 3;
+        inputFile.add(numTimestampText, gbc_numTimestampText);
+        numTimestampText.setColumns(10);
+        
+        btnComputeInput = new JButton("");
+        btnComputeInput.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		int numQuery = -1;
+            	int numTimestamp = -1;
+            	File file = fc.getSelectedFile();
+            	
+            	if(numQueryText.getText() != "" && numTimestampText.getText() != "" && file!=null){
+            		numQuery = Integer.parseInt(numQueryText.getText());
+                	numTimestamp = Integer.parseInt(numTimestampText.getText());
+                	
+            		JTextField t = new JTextField();
+                    t.setColumns(10);
+                    inputTimeText.add(t);
+                    JTextField sup = new JTextField();
+                    sup.setColumns(10);
+                    inputSupText.add(sup);
                     btnStart.setEnabled(true);
+                    addRowButton.setEnabled(true);
                     
-                    ArrayList<String> m = new ArrayList<String>();
+                    m = new ArrayList<String>();
         			BufferedReader br = null;
 					try {
 						br = new BufferedReader(new FileReader(file));
@@ -225,33 +337,66 @@ public class AidaView {
 					}
         			String line = "";
         			String cvsSplitBy = ", ";
-        			int i=0;
+        			//int i=0;
 					try {
 						while ((line = br.readLine()) != null) {        				
 							// use comma as separator
 							String[] token = line.split(cvsSplitBy);
-							if(!m.contains(token[1]))	m.add(token[1]);
-							i++;
+							System.out.println(!m.contains(token[numQuery]));
+							System.out.println(token[numQuery]);
+							if(!m.contains(token[numQuery]))	m.add(token[numQuery]);
+							//i++;
 						}
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-                    queryMenu = new JComboBox(m.toArray());
-                    queryMenu.setBounds(20, 183, 400, 20);
-                    inputPanel.add(queryMenu);
-                }
+					errorLabel.setText("");
+                    JComboBox qm = new JComboBox(m.toArray());
+                    qm.setBounds(20, 183, 400, 20);
+                    queryMenu.add(qm);
+                    qm.setBounds(20, 183, 400, 20);
+                    //queryMenu.add(qm);
+                    table.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(qm));
+                    //inputPanel.add(queryMenu);
+                    dtm.addRow(new Object[] { "Choose the teQuery..", 
+                    		"", ""});
+            	} else {
+            		errorLabel.setText("All field must be correctly filled!\n");
+            	}	
         	}
         });
-        inputLogText.setBounds(10, 87, 322, 20);
-        inputPanel.add(inputLogText);
-        inputLogText.setColumns(10);
+        btnComputeInput.setIcon(new ImageIcon(AidaView.class.getResource("/aidaView/vverde.png")));
+        GridBagConstraints gbc_btnComputeInput = new GridBagConstraints();
+        gbc_btnComputeInput.anchor = GridBagConstraints.EAST;
+        gbc_btnComputeInput.insets = new Insets(0, 0, 5, 5);
+        gbc_btnComputeInput.gridx = 2;
+        gbc_btnComputeInput.gridy = 3;
+        inputFile.add(btnComputeInput, gbc_btnComputeInput);
+        GridBagConstraints gbc_addRowButton = new GridBagConstraints();
+        gbc_addRowButton.gridwidth = 3;
+        gbc_addRowButton.fill = GridBagConstraints.HORIZONTAL;
+        gbc_addRowButton.insets = new Insets(5, 5, 5, 15);
+        gbc_addRowButton.gridx = 0;
+        gbc_addRowButton.gridy = 4;
+        inputFile.add(addRowButton, gbc_addRowButton);
         
-        JButton btnOpenLog = new JButton("");
-        btnOpenLog.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
+        inputLogText = new JTextField();
+        GridBagConstraints gbc_inputLogText = new GridBagConstraints();
+        gbc_inputLogText.gridwidth = 2;
+        gbc_inputLogText.fill = GridBagConstraints.HORIZONTAL;
+        gbc_inputLogText.insets = new Insets(5, 5, 5, 5);
+        gbc_inputLogText.gridx = 0;
+        gbc_inputLogText.gridy = 1;
+        inputFile.add(inputLogText, gbc_inputLogText);
+        
+        queryMenu = new ArrayList<JComboBox>();
+        
+        inputLogText.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent arg0) {
         		int returnVal = fc.showOpenDialog(frmAidaAutomatic);
-        		 
+       		 
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
                     String s = file.getAbsolutePath();
@@ -259,45 +404,85 @@ public class AidaView {
                 }
             }
         });
-        btnOpenLog.setIcon(new ImageIcon(AidaView.class.getResource("open.png")));
-        btnOpenLog.setBounds(336, 85, 38, 23);
-        inputPanel.add(btnOpenLog);
+        inputLogText.setColumns(10);
         
         JLabel lblInputLogFile = new JLabel("Input Log File");
-        lblInputLogFile.setBounds(10, 68, 81, 14);
-        inputPanel.add(lblInputLogFile);
-        
-        inputTimeText = new JTextField();
-        inputTimeText.setEnabled(false);
-        inputTimeText.setBounds(54, 232, 150, 20);
-        inputPanel.add(inputTimeText);
-        inputTimeText.setColumns(10);
-        
-        JLabel lblTimeForIndex = new JLabel("Time (in ms)");
-        lblTimeForIndex.setBounds(95, 219, 76, 14);
-        inputPanel.add(lblTimeForIndex);
-        
-        JLabel lblMinimumSupport = new JLabel("Minimum Support");
-        lblMinimumSupport.setBounds(207, 219, 89, 14);
-        inputPanel.add(lblMinimumSupport);
-        
-        inputSupText = new JTextField();
-        inputSupText.setEnabled(false);
-        inputSupText.setBounds(229, 232, 50, 20);
-        inputPanel.add(inputSupText);
-        inputSupText.setColumns(10);
-        
-        JLabel lblInputParameter = new JLabel("INPUT PARAMETER");
-        lblInputParameter.setFont(new Font("Tahoma", Font.BOLD, 15));
-        lblInputParameter.setBackground(Color.GRAY);
-        lblInputParameter.setBounds(127, 23, 151, 25);
-        inputPanel.add(lblInputParameter);
+        GridBagConstraints gbc_lblInputLogFile = new GridBagConstraints();
+        gbc_lblInputLogFile.insets = new Insets(0, 0, 5, 5);
+        gbc_lblInputLogFile.gridx = 0;
+        gbc_lblInputLogFile.gridy = 0;
+        inputFile.add(lblInputLogFile, gbc_lblInputLogFile);
         
         errorLabel = new JLabel("");
+        errorLabel.setHorizontalAlignment(SwingConstants.TRAILING);
+        errorLabel.setAlignmentY(Component.TOP_ALIGNMENT);
+        errorLabel.setVerticalAlignment(SwingConstants.TOP);
+        inputPanel.add(errorLabel);
         errorLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
         errorLabel.setForeground(Color.RED);
-        errorLabel.setBounds(10, 300, 364, 33);
-        inputPanel.add(errorLabel);
+          
+        // inputTeQuery.add(errorLabel);
+
+        inputTeQuery = new JPanel();
+        inputPanel.add(inputTeQuery);
+        
+        table = new JTable();
+        inputTeQuery.add(table);
+        table.setBorder(new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null));
+        dtm = new DefaultTableModel(0, 0);
+
+        //add header of the table
+      	String header[] = new String[] { "teQuery", "Time (ms)", "Min Sup"};
+
+      	//add header in table model
+      	dtm.setColumnIdentifiers(header);
+        //set model into the table object
+        table.setModel(dtm);
+        table.getColumnModel().getColumn(2).setMaxWidth(80);
+        table.getColumnModel().getColumn(1).setMaxWidth(180);
+        inputTeQuery.setLayout(new BoxLayout(inputTeQuery, BoxLayout.Y_AXIS));
+        
+        scrollPane = new JScrollPane(table);
+        inputTeQuery.add(scrollPane);
+        
+        inputButton = new JPanel();
+        inputPanel.add(inputButton);
+        GridBagLayout gbl_inputButton = new GridBagLayout();
+        gbl_inputButton.columnWidths = new int[]{0, 63, 0, 65, 0, 0};
+        gbl_inputButton.rowHeights = new int[]{0, 0};
+        gbl_inputButton.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_inputButton.rowWeights = new double[]{1.0, Double.MIN_VALUE};
+        inputButton.setLayout(gbl_inputButton);
+        
+        
+        JButton btnReset = new JButton("RESET");
+        GridBagConstraints gbc_btnReset = new GridBagConstraints();
+        gbc_btnReset.anchor = GridBagConstraints.WEST;
+        gbc_btnReset.insets = new Insets(0, 0, 0, 5);
+        gbc_btnReset.gridx = 1;
+        gbc_btnReset.gridy = 0;
+        inputButton.add(btnReset, gbc_btnReset);
+        btnReset.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		getInputTeQuery();
+//        		inputLogText.setText("");
+//        		inputTimeText.clear();
+//        		inputSupText.clear();
+//        		numQueryText.setText("");
+//        		numTimestampText.setText("");
+//        		dtm.setRowCount(0);
+//        		outputTextArea.setText("");
+        	}
+        });
+        
+        btnStart = new JButton("START");
+        GridBagConstraints gbc_btnStart = new GridBagConstraints();
+        gbc_btnStart.insets = new Insets(0, 0, 0, 5);
+        gbc_btnStart.anchor = GridBagConstraints.EAST;
+        gbc_btnStart.gridx = 3;
+        gbc_btnStart.gridy = 0;
+        inputButton.add(btnStart, gbc_btnStart);
+        btnStart.setEnabled(false);
         
         outputPanel = new JPanel();
         outputPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
@@ -309,40 +494,6 @@ public class AidaView {
         outputPanel.add(outputTextArea);
         outputScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         trainingPanel.add(outputScrollPanel);
-        
-        btnStart = new JButton("START");
-        btnStart.setEnabled(false);
-        /*btnStart.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent arg0) {
-        		inputLog = inputLogText.getText();
-        		inputTime = inputTimeText.getText();
-        		inputSup = inputSupText.getText();
-        		float inSup;
-        		int inTime;
-        		
-        		errorLabel.setText("");
-        		if(inputLog.isEmpty() || inputTime.isEmpty() || inputSup.isEmpty()){
-        			errorLabel.setText("ERROR! All fields must be filled!");
-        			return;
-        		} else {
-        			inSup = Float.parseFloat(inputSup);
-            		inTime = Integer.parseInt(inputTime);
-        			if(inSup<0 || inSup>1){
-        				errorLabel.setText("ERROR! Support must be a number between 0 and 1!");
-        				return;
-        			}
-        		//QUI l'output della prima parte!
-        		outputTextArea.setText(inputLog+"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+inputLog);
-        		tabbedPane.setEnabledAt(1, true);
-        		}
-        	}
-        });*/
-        btnStart.setBounds(248, 383, 89, 23);
-        inputPanel.add(btnStart);
-        
-        JLabel lblNewLabel = new JLabel("teQuery");
-        lblNewLabel.setBounds(64, 170, 46, 14);
-        inputPanel.add(lblNewLabel);
         
         //trainingPanel.add(panel);
         return trainingPanel;
@@ -356,41 +507,45 @@ public class AidaView {
         JPanel flowingPanel = new JPanel();
         flowingPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         forecastingPanel.add(flowingPanel);
-        flowingPanel.setLayout(new BorderLayout(5, 5));
-        
-        startFlowBtn = new JButton("START FLOW");
-        flowingPanel.add(startFlowBtn, BorderLayout.WEST);
-        
-        pauseFlowBtn = new JButton("PAUSE FLOW");
-        flowingPanel.add(pauseFlowBtn, BorderLayout.CENTER);
-        
-        stopFlowBtn = new JButton("STOP FLOW");
-        flowingPanel.add(stopFlowBtn, BorderLayout.EAST);
+        flowingPanel.setLayout(new BoxLayout(flowingPanel, BoxLayout.Y_AXIS));
         
         flowingQueriesArea = new JTextArea();
         flowingQueriesArea.setEditable(false);
-        flowingQueriesArea.setRows(15);
+        //flowingQueriesArea.setRows(15);
         flowingQueriesArea.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         DefaultCaret caret = (DefaultCaret)flowingQueriesArea.getCaret();  
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane fqPanel = new JScrollPane(flowingQueriesArea);
         fqPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        flowingPanel.add(fqPanel, BorderLayout.NORTH);
+        flowingPanel.add(fqPanel);
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         
         outputForecast = new JTextArea();
         outputForecast.setEditable(false);
-        outputForecast.setRows(12);
+        //outputForecast.setRows(12);
         outputForecast.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         DefaultCaret caret1 = (DefaultCaret)outputForecast.getCaret();  
         caret1.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         
+        buttonPanel = new JPanel();
+        flowingPanel.add(buttonPanel);
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        
+        startFlowBtn = new JButton("START FLOW");
+        buttonPanel.add(startFlowBtn);
+        
+        pauseFlowBtn = new JButton("PAUSE FLOW");
+        buttonPanel.add(pauseFlowBtn);
+        
+        stopFlowBtn = new JButton("STOP FLOW");
+        buttonPanel.add(stopFlowBtn);
+        
         JScrollPane outputAreaPanel = new JScrollPane(outputForecast);
         outputAreaPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        flowingPanel.add(outputAreaPanel, BorderLayout.SOUTH);
+        flowingPanel.add(outputAreaPanel);
         
         currentSpPanel = new JPanel();
         currentSpPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-        currentSpPanel.setLayout(new GridLayout(16, 1));
+        currentSpPanel.setLayout(new GridLayout(0,1));
         cspPanel = new JScrollPane(currentSpPanel);
         cspPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         forecastingPanel.add(cspPanel);
@@ -428,6 +583,12 @@ public class AidaView {
         }
         cc.setLabels(b2);
         cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+        cc.setMinimumSize(new Dimension(20, 30));
+        currentSpPanel.add(cc);
+        currentSpPanel.revalidate();
+        currentSpPanel.repaint();
+        cspPanel.revalidate();
+        cspPanel.repaint();
         return cc;
     }
     
@@ -454,6 +615,10 @@ public class AidaView {
         }
         cc.setLabels(b2);
         cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+        cc.setMinimumSize(new Dimension(20, 30));
+        currentSpPanel.add(cc);
+        currentSpPanel.revalidate();
+        currentSpPanel.repaint();
         return cc;
     }
     
@@ -523,36 +688,57 @@ public class AidaView {
     	currentSpPanel.repaint();
     }
     
-    public List<String> getInputParameter(){
+    public List<String> getInputTime(){
+    	inputTime = new ArrayList<String>();
     	
+    	for(int i=0; i<inputTimeText.size();i++){
+    		inputTime.add(inputTimeText.get(i).getText());
+    	}
+    	
+    	return inputTime;
+    }
+    
+    public List<String> getInputSup(){
+    	inputSup = new ArrayList<String>();
+    	
+    	for(int i=0; i<inputSupText.size();i++){
+    		inputSup.add(inputSupText.get(i).getText());
+    	}
+    	
+    	return inputSup;
+    }
+    
+    public List<String> getInputTeQuery(){
+    	teQueries = new ArrayList<String>();
+    	table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+    	
+    	for(int i=0; i<inputSupText.size();i++){
+    		teQueries.add(table.getCellEditor(i, 0).getCellEditorValue().toString());
+    	}
+    	
+    	return teQueries;
+    }
+    
+    public String getInputLog(){
+
     	inputLog = inputLogText.getText();
-		inputTime = inputTimeText.getText();
-		inputSup = inputSupText.getText();
-		double inSup;
-		//int inTime; Non usato in controlli
 		
 		errorLabel.setText("");
-		if(inputLog.isEmpty() || inputTime.isEmpty() || inputSup.isEmpty()){
-			errorLabel.setText("ERROR! All fields must be filled!");
-			return null;
-		} else {
-			inSup = Float.parseFloat(inputSup);
-			if(inSup<0 || inSup>1){
-				errorLabel.setText("ERROR! Support must be a number between 0 and 1!");
-				return null;
-			}
+//		if(inputLog.isEmpty() || inputTime.isEmpty() || inputSup.isEmpty()){
+//			errorLabel.setText("ERROR! All fields must be filled!");
+//			return null;
+//		} else {
+//			inSup = Float.parseFloat(inputSup);
+//			if(inSup<0 || inSup>1){
+//				errorLabel.setText("ERROR! Support must be a number between 0 and 1!");
+//				return null;
+//			}
 		//QUI l'output della prima parte!
 		//outputTextArea.setText(inputLog+"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+inputLog);
 		tabbedPane.setEnabledAt(1, true);
-		
-    	List<String> in = new ArrayList<String>();
     	
-    	in.add(inputLog);
-    	in.add(inputTime);
-    	in.add(inputSup);
-    	
-    	return in;
-		}
-    }
+    	return inputLog;
+	}
+    
 }
 

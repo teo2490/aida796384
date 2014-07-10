@@ -29,6 +29,10 @@ public class ConnectorContainer extends JPanel {
         this.connectors = connectors;
         this.nodes=n;
     }
+    
+    public void setSize(int w, int h){
+    	super.setSize(w, h);
+    }
 
     public void setConnectors(JConnector[] connectors) {
         this.connectors = connectors;
