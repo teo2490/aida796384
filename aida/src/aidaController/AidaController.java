@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JTable;
+
 import exception.InvalidSequentialPatternException;
 
 import prefixspan.MainTestPrefixSpan_saveToFile;
@@ -39,39 +41,46 @@ import aidaView.AidaView;
 
 public class AidaController {
 	AidaView view;
-	private Manager model;
+	private List<Manager> model;
 	
 	private List<Double> inSup;
 	private List<Integer> inTime;
 	
-	private List<SequentialPattern> sp;
+	private List<List<SequentialPattern>> sp;
 	
 	private boolean running;
 	private Thread t;
 	
-	public AidaController(Manager m, AidaView v){
+	public AidaController(AidaView v){
 		this.view = v;
-		this.model = m;
 		this.running=false;
+		model = new ArrayList<Manager>();
 		
 		inSup = new ArrayList<Double>();
 		inTime = new ArrayList<Integer>();
+		sp = new ArrayList<List<SequentialPattern>>();
 
 		//This listener starts the TRAINING phase when the START button is clicked
 		view.getStartBtn().addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		//Getting back parameter
         		String inLog = view.getInputLog();
+        		List<String> teQueryList = view.getInputTeQuery();
         		List<String> times = view.getInputTime();
         		List<String> sups = view.getInputSup();
+        		System.out.println("TEQ: "+teQueryList);
+        		System.out.println("TIMES: "+times);
+        		System.out.println("SUPS: "+sups);
         		if(inLog!= null && times!= null && sups!= null){
 	        		for(int i=0; i<times.size(); i++){
 	        			inSup.add(Double.parseDouble(sups.get(i)));
 	        			inTime.add(Integer.parseInt(times.get(i)));
 	        		}
 	        		try {
-	        			//Start the training ////////
-	        			training(inLog);
+	        			//Start the training ////////devo recuperare la teQuery
+	        			for(int i=0; i<teQueryList.size(); i++){
+	        				training(inLog, teQueryList.get(i), inSup.get(i), i);
+	        			}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -84,6 +93,7 @@ public class AidaController {
 		view.getStartFlowBtn().addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		running=true;
+        		
         		try {
 					forecasting();
 				} catch (InterruptedException
@@ -115,23 +125,23 @@ public class AidaController {
 	 * @param inLog	The path of the input log
 	 * @throws Exception
 	 */
-	public void training(String inLog) throws Exception{
+	public void training(String inLog, String teQuery, Double inSup, int count) throws Exception{
 		view.printTrainingOutput("----------------------- Training Part output -----------------------");
-		
+		Manager md = new Manager();
 		//Parsing the CSV input 
-		model.parseCSVtoTXT(inLog,
-				"C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan.txt",
-				"SELECT * FROM sensors");	 
+		md.parseCSVtoTXT(inLog,
+				"C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan_"+count+".txt",
+				teQuery);	 
 		
 		//Printing association between string queries and their symbols
-		Map<String, Integer> association = model.getAssociationMap();
+		Map<String, Integer> association = md.getAssociationMap();
 		view.printTrainingOutput("\n----- Query Symbol Association -----\n");
 		view.printTrainingOutput(association.toString());
 		view.printTrainingOutput("\n------------------------------------------------");
 		
 		//Printing the input log splitted in chunck
 		view.printTrainingOutput("\n----- Chunck of input Log -----\n");
-		 Map<Integer, List<Integer>> chunck = model.getChunckMap();
+		 Map<Integer, List<Integer>> chunck = md.getChunckMap();
 		 for(int j=0; j<chunck.size(); j++){
 			 view.printTrainingOutput(chunck.get(j).toString());
 		 }
@@ -140,8 +150,8 @@ public class AidaController {
 		// Launching PrefixSpan Algorithm..
 		view.printTrainingOutput("\nLaunching PrefixSpan Algorithm..\n");
 		String[] arg = new String[3];
-		arg[0]="C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan.txt";
-		arg[1]="C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan.txt";
+		arg[0]="C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan_"+count+".txt";
+		arg[1]="C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan_"+count+".txt";
 		arg[2]=Double.toString(inSup);
 		MainTestPrefixSpan_saveToFile.main(arg);
 		view.printTrainingOutput("Sequential pattern search done.\n");
@@ -149,14 +159,15 @@ public class AidaController {
 		// Parsing PrefixSPan Output
 		/* Now I have to parse outputPrefixSpan.txt in order to retrieve the frequent sequential patter that I need (the ones that
 		contains the time-expensive query) and use them in order to calculate the "duration" of a pattern.. */
-		sp = model.parseSP("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan.txt");
+		sp.add(md.parseSP("C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan_"+count+".txt"));
 		
 		//Finding Sequential Pattern in the chuncks of log
-		model.findSP(sp);
+		md.findSP(sp.get(sp.size()-1));
+		model.add(md);
 		
 		view.printTrainingOutput("----- Enriched Sequential Pattern Found -----\n");
 		for(int i=0; i<sp.size(); i++){
-			view.printTrainingOutput(sp.get(i).toString()+"\n");
+			view.printTrainingOutput(sp.get(sp.size()-1).get(i).toString()+"\n");
 		}
 	}
 	
@@ -176,10 +187,12 @@ public class AidaController {
 //		//Used in place of the for-block for ad-hoc testin purposes
 //		initiater.makeQuery();
 		final Simulator initiater = new Simulator(5, view);
-		Listener r1 = new Listener(sp, inTime, view);
-
-		initiater.addListener(r1);
 		
+		for(int i=0; i<sp.size(); i++){
+			Listener r1 = new Listener(sp.get(i), inTime.get(i), view);
+			initiater.addListener(r1);
+		}
+
 		view.printForecastingQueries("\nSTARTING EXECUTION!\n");
 		
 		t = new Thread(){

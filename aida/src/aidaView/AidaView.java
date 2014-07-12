@@ -133,6 +133,7 @@ public class AidaView {
 	private JButton btnComputeInput;
 	
 	private File file;
+	private List<Object> removed;
 	
 	/**
 	 * Launch the application.
@@ -353,6 +354,27 @@ public class AidaView {
 					}
 					errorLabel.setText("");
                     JComboBox qm = new JComboBox(m.toArray());
+                    removed = new ArrayList<Object>();
+                    qm.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            //
+                            // Get the source of the component, which is our combo
+                            // box.
+                            //
+                            JComboBox comboBox = (JComboBox) event.getSource();
+
+                            Object selected = comboBox.getSelectedItem();
+                            /////////////////////////////////////////////////////////
+                            if(removed.contains(selected)){ 
+                            	comboBox.removeAll();
+                            	for(int k=0; k<m.size(); k++)      	comboBox.addItem(m.get(k));
+                            }
+                            comboBox.removeItem(selected);
+                            removed.add(selected);
+                            //////////////////////
+                        }
+
+                    });
                     qm.setBounds(20, 183, 400, 20);
                     queryMenu.add(qm);
                     qm.setBounds(20, 183, 400, 20);
@@ -482,6 +504,11 @@ public class AidaView {
         gbc_btnStart.gridx = 3;
         gbc_btnStart.gridy = 0;
         inputButton.add(btnStart, gbc_btnStart);
+        btnStart.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		if (table.isEditing())	table.getCellEditor().stopCellEditing();
+        	}
+        });
         btnStart.setEnabled(false);
         
         outputPanel = new JPanel();
@@ -690,9 +717,12 @@ public class AidaView {
     
     public List<String> getInputTime(){
     	inputTime = new ArrayList<String>();
+    	table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+    	if(table.isEditing())	table.getCellEditor().stopCellEditing();
     	
     	for(int i=0; i<inputTimeText.size();i++){
-    		inputTime.add(inputTimeText.get(i).getText());
+    		inputTime.add(table.getValueAt(i, 1).toString());
+    		System.out.println(table.getValueAt(i, 1).toString());
     	}
     	
     	return inputTime;
@@ -700,9 +730,12 @@ public class AidaView {
     
     public List<String> getInputSup(){
     	inputSup = new ArrayList<String>();
+    	table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+    	if(table.isEditing())	table.getCellEditor().stopCellEditing();
     	
     	for(int i=0; i<inputSupText.size();i++){
-    		inputSup.add(inputSupText.get(i).getText());
+    		inputSup.add(table.getValueAt(i, 2).toString());
+    		System.out.println(table.getValueAt(i, 2).toString());
     	}
     	
     	return inputSup;
@@ -711,9 +744,10 @@ public class AidaView {
     public List<String> getInputTeQuery(){
     	teQueries = new ArrayList<String>();
     	table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+    	if(table.isEditing())	table.getCellEditor().stopCellEditing();
     	
     	for(int i=0; i<inputSupText.size();i++){
-    		teQueries.add(table.getCellEditor(i, 0).getCellEditorValue().toString());
+    		teQueries.add(table.getModel().getValueAt(i, 0).toString());
     	}
     	
     	return teQueries;
