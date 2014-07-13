@@ -166,7 +166,7 @@ public class AidaController {
 		model.add(md);
 		
 		view.printTrainingOutput("----- Enriched Sequential Pattern Found -----\n");
-		for(int i=0; i<sp.size(); i++){
+		for(int i=0; i<sp.get(count).size(); i++){
 			view.printTrainingOutput(sp.get(sp.size()-1).get(i).toString()+"\n");
 		}
 	}

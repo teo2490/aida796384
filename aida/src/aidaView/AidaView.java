@@ -134,6 +134,7 @@ public class AidaView {
 	
 	private File file;
 	private List<Object> removed;
+	private int currentNumRow = 1;
 	
 	/**
 	 * Launch the application.
@@ -241,16 +242,20 @@ public class AidaView {
         addRowButton.setEnabled(false);
         addRowButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
-
-        		JTextField t = new JTextField();
-                t.setColumns(10);
-                inputTimeText.add(t);
-                JTextField sup = new JTextField();
-                sup.setColumns(10);
-                inputSupText.add(sup);
-                
-                dtm.addRow(new Object[] { "Choose the teQuery..", 
-                		"", ""});
+        		if(currentNumRow<m.size()){
+	        		JTextField t = new JTextField();
+	                t.setColumns(10);
+	                inputTimeText.add(t);
+	                JTextField sup = new JTextField();
+	                sup.setColumns(10);
+	                inputSupText.add(sup);
+	                
+	                dtm.addRow(new Object[] { "Choose the teQuery..", 
+	                		"", ""});
+	                
+	                currentNumRow++;
+	                if(currentNumRow==m.size())	addRowButton.setEnabled(false);
+        		}
         	}
         });
         
@@ -354,27 +359,27 @@ public class AidaView {
 					}
 					errorLabel.setText("");
                     JComboBox qm = new JComboBox(m.toArray());
-                    removed = new ArrayList<Object>();
-                    qm.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            //
-                            // Get the source of the component, which is our combo
-                            // box.
-                            //
-                            JComboBox comboBox = (JComboBox) event.getSource();
-
-                            Object selected = comboBox.getSelectedItem();
-                            /////////////////////////////////////////////////////////
-                            if(removed.contains(selected)){ 
-                            	comboBox.removeAll();
-                            	for(int k=0; k<m.size(); k++)      	comboBox.addItem(m.get(k));
-                            }
-                            comboBox.removeItem(selected);
-                            removed.add(selected);
-                            //////////////////////
-                        }
-
-                    });
+//                    removed = new ArrayList<Object>();
+//                    qm.addActionListener(new ActionListener() {
+//                        public void actionPerformed(ActionEvent event) {
+//                            //
+//                            // Get the source of the component, which is our combo
+//                            // box.
+//                            //
+//                            JComboBox comboBox = (JComboBox) event.getSource();
+//
+//                            Object selected = comboBox.getSelectedItem();
+//                            /////////////////////////////////////////////////////////
+//                            if(removed.contains(selected)){ 
+//                            	comboBox.removeAll();
+//                            	for(int k=0; k<m.size(); k++)      	comboBox.addItem(m.get(k));
+//                            }
+//                            comboBox.removeItem(selected);
+//                            removed.add(selected);
+//                            //////////////////////
+//                        }
+//
+//                    });
                     qm.setBounds(20, 183, 400, 20);
                     queryMenu.add(qm);
                     qm.setBounds(20, 183, 400, 20);
@@ -486,14 +491,14 @@ public class AidaView {
         inputButton.add(btnReset, gbc_btnReset);
         btnReset.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
-        		getInputTeQuery();
-//        		inputLogText.setText("");
-//        		inputTimeText.clear();
-//        		inputSupText.clear();
-//        		numQueryText.setText("");
-//        		numTimestampText.setText("");
-//        		dtm.setRowCount(0);
-//        		outputTextArea.setText("");
+        		inputLogText.setText("");
+        		inputTimeText.clear();
+        		inputSupText.clear();
+        		numQueryText.setText("");
+        		numTimestampText.setText("");
+        		dtm.setRowCount(0);
+        		outputTextArea.setText("");
+        		currentNumRow=1;
         	}
         });
         
