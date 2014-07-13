@@ -63,6 +63,7 @@ import javax.swing.border.BevelBorder;
  * The view of the application.
  *
  * Copyright (c) 2014 Matteo Simoni 796384
+ * Mail to matteo.simoni@mail.polimi.it
  * 
  * This file is part of the AIDA SOFTWARE
  * (https://code.google.com/p/aida796384/).

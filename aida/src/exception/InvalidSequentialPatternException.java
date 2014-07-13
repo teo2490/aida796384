@@ -4,6 +4,7 @@ package exception;
  * Exception thrown in case of malformed sequential pattern.
  * 
  * @author Matteo Simoni 796384
+ * Mail to matteo.simoni@mail.polimi.it
  *
  */
 public class InvalidSequentialPatternException extends Exception {
