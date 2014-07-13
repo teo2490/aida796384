@@ -9,7 +9,6 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -21,7 +20,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.JLabel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultCaret;
 import javax.swing.JTextField;
@@ -42,7 +40,6 @@ import javax.swing.JTextArea;
 
 import exception.InvalidSequentialPatternException;
 
-import aidaModel.Manager;
 import aidaModel.SequentialPattern;
 import aidaView.sequentialPatternView.ConnectorContainer;
 import aidaView.sequentialPatternView.JConnector;
@@ -60,7 +57,6 @@ import java.awt.Insets;
 import javax.swing.JTable;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
-import java.awt.FlowLayout;
 
 
 /*** 
@@ -108,7 +104,6 @@ public class AidaView {
 	private ArrayList<String> inputSup;
 	private ArrayList<String> teQueries;
 	
-	private ArrayList<JComboBox> queryMenu;
 	private JPanel inputPanel;
 	
 	private JPanel currentSpPanel;
@@ -133,7 +128,7 @@ public class AidaView {
 	private JButton btnComputeInput;
 	
 	private File file;
-	private List<Object> removed;
+	private List<String> removed;
 	private int currentNumRow = 1;
 	
 	/**
@@ -317,12 +312,10 @@ public class AidaView {
         btnComputeInput.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
         		int numQuery = -1;
-            	int numTimestamp = -1;
             	File file = fc.getSelectedFile();
             	
             	if(numQueryText.getText() != "" && numTimestampText.getText() != "" && file!=null){
             		numQuery = Integer.parseInt(numQueryText.getText());
-                	numTimestamp = Integer.parseInt(numTimestampText.getText());
                 	
             		JTextField t = new JTextField();
                     t.setColumns(10);
@@ -338,7 +331,6 @@ public class AidaView {
 					try {
 						br = new BufferedReader(new FileReader(file));
 					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
         			String line = "";
@@ -354,34 +346,28 @@ public class AidaView {
 							//i++;
 						}
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					errorLabel.setText("");
-                    JComboBox qm = new JComboBox(m.toArray());
-//                    removed = new ArrayList<Object>();
-//                    qm.addActionListener(new ActionListener() {
-//                        public void actionPerformed(ActionEvent event) {
-//                            //
-//                            // Get the source of the component, which is our combo
-//                            // box.
-//                            //
-//                            JComboBox comboBox = (JComboBox) event.getSource();
-//
-//                            Object selected = comboBox.getSelectedItem();
-//                            /////////////////////////////////////////////////////////
-//                            if(removed.contains(selected)){ 
-//                            	comboBox.removeAll();
-//                            	for(int k=0; k<m.size(); k++)      	comboBox.addItem(m.get(k));
-//                            }
-//                            comboBox.removeItem(selected);
-//                            removed.add(selected);
-//                            //////////////////////
-//                        }
-//
-//                    });
+                    @SuppressWarnings({ "rawtypes", "unchecked" })
+					final JComboBox qm = new JComboBox(m.toArray());
+                    removed = new ArrayList<String>();
+                    qm.addActionListener(new ActionListener() {
+                        @SuppressWarnings("unchecked")
+						public void actionPerformed(ActionEvent event) {
+                        	table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+                        	if(table.isEditing())	table.getCellEditor().stopCellEditing();
+                        	removed.clear();
+                        	for(int i=0; i<inputSupText.size();i++){
+                        		removed.add(table.getModel().getValueAt(i, 0).toString());
+                        	}
+
+                            qm.removeAllItems();
+                            for(int k=0; k<m.size(); k++)      	if(!removed.contains(m.get(k))) 	qm.addItem(m.get(k));
+                        }
+
+                    });
                     qm.setBounds(20, 183, 400, 20);
-                    queryMenu.add(qm);
                     qm.setBounds(20, 183, 400, 20);
                     //queryMenu.add(qm);
                     table.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(qm));
@@ -416,8 +402,6 @@ public class AidaView {
         gbc_inputLogText.gridx = 0;
         gbc_inputLogText.gridy = 1;
         inputFile.add(inputLogText, gbc_inputLogText);
-        
-        queryMenu = new ArrayList<JComboBox>();
         
         inputLogText.addMouseListener(new MouseAdapter() {
         	@Override
@@ -499,6 +483,7 @@ public class AidaView {
         		dtm.setRowCount(0);
         		outputTextArea.setText("");
         		currentNumRow=1;
+        		removed.clear();
         	}
         });
         

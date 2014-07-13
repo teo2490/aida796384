@@ -1,6 +1,5 @@
 package aidaController;
 
-import aidaModel.Manager;
 import aidaView.AidaView;
 
 
