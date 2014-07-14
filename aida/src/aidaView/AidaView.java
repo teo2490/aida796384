@@ -9,8 +9,9 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
 import javax.swing.JPanel;
@@ -201,7 +202,7 @@ public class AidaView {
 	        
 	        //Set the forecasting tab disabled at launch. It will be enabled after the training phase is done
 	        tabbedPane.setEnabledAt(1, false);
-	        	         
+
 	        //The following line enables to use scrolling tabs.
 	        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	}
@@ -563,9 +564,8 @@ public class AidaView {
         
         currentSpPanel = new JPanel();
         currentSpPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-        currentSpPanel.setLayout(new GridLayout(0,1));
         cspPanel = new JScrollPane(currentSpPanel);
-        cspPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        currentSpPanel.setLayout(new BoxLayout(currentSpPanel, BoxLayout.Y_AXIS));
         forecastingPanel.add(cspPanel);
         
         return forecastingPanel;
@@ -579,8 +579,8 @@ public class AidaView {
     protected ConnectorContainer initSp(SequentialPattern i){
     	JConnector[] connectors = new JConnector[i.getNumberOfEdges()];
     	ConnectorContainer cc = new ConnectorContainer(connectors);
-        cc.setLayout(null);
-        //cc.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    	cc.setLayout(new FlowLayout(FlowLayout.LEADING));
+        //cc.setLayout(null);
         JLabel[] b2 = new JLabel[i.getNumberOfNodes()];
         b2[0]=new JLabel("  q"+i.getNode(0));
         b2[0].setBounds(0, 10, 30, 30);
@@ -601,7 +601,7 @@ public class AidaView {
         }
         cc.setLabels(b2);
         cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-        cc.setMinimumSize(new Dimension(20, 30));
+        //cc.setMinimumSize(new Dimension(80, 50));
         currentSpPanel.add(cc);
         currentSpPanel.revalidate();
         currentSpPanel.repaint();
@@ -613,8 +613,8 @@ public class AidaView {
     protected ConnectorContainer addScheduled(SequentialPattern i){
     	JConnector[] connectors = new JConnector[i.getNumberOfEdges()];
     	ConnectorContainer cc = new ConnectorContainer(connectors);
-        cc.setLayout(null);
-        //cc.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    	cc.setLayout(new FlowLayout(FlowLayout.LEFT));
+        //cc.setLayout(null);
         JLabel[] b2 = new JLabel[i.getNumberOfNodes()];
         b2[0]=new JLabel("  q"+i.getNode(0));
         b2[0].setBounds(0, 10, 30, 30);
@@ -633,7 +633,7 @@ public class AidaView {
         }
         cc.setLabels(b2);
         cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-        cc.setMinimumSize(new Dimension(20, 30));
+        //cc.setMinimumSize(new Dimension(20, 30));
         currentSpPanel.add(cc);
         currentSpPanel.revalidate();
         currentSpPanel.repaint();
