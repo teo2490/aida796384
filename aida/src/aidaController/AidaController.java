@@ -48,6 +48,8 @@ public class AidaController {
 	
 	private boolean running;
 	private Thread t;
+	private String out="";
+	private boolean once = false;
 	
 	public AidaController(AidaView v){
 		this.view = v;
@@ -66,9 +68,6 @@ public class AidaController {
         		List<String> teQueryList = view.getInputTeQuery();
         		List<String> times = view.getInputTime();
         		List<String> sups = view.getInputSup();
-        		System.out.println("TEQ: "+teQueryList);
-        		System.out.println("TIMES: "+times);
-        		System.out.println("SUPS: "+sups);
         		if(inLog!= null && times!= null && sups!= null){
 	        		for(int i=0; i<times.size(); i++){
 	        			inSup.add(Double.parseDouble(sups.get(i)));
@@ -79,12 +78,14 @@ public class AidaController {
 	        			for(int i=0; i<teQueryList.size(); i++){
 	        				training(inLog, teQueryList.get(i), inSup.get(i), i);
 	        			}
+	        			out=out+"\n----- Enriched Sequential Pattern Found -----\n";
+	        			view.printOutputLabel(out);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
         		}
-        		view.printTrainingOutput("------------------------------------------------");
-        		view.printTrainingOutput("READY FOR FORECASTING PHASE! Change Tab.");
+        		//view.printTrainingOutput("------------------------------------------------");
+        		//view.printTrainingOutput("READY FOR FORECASTING PHASE! Change Tab.");
         	}
         });
 		
@@ -124,7 +125,6 @@ public class AidaController {
 	 * @throws Exception
 	 */
 	public void training(String inLog, String teQuery, Double inSup, int count) throws Exception{
-		view.printTrainingOutput("----------------------- Training Part output -----------------------");
 		Manager md = new Manager();
 		//Parsing the CSV input 
 		md.parseCSVtoTXT(inLog,
@@ -132,27 +132,26 @@ public class AidaController {
 				teQuery);	 
 		
 		//Printing association between string queries and their symbols
-		Map<String, Integer> association = md.getAssociationMap();
-		view.printTrainingOutput("\n----- Query Symbol Association -----\n");
-		view.printTrainingOutput(association.toString());
-		view.printTrainingOutput("\n------------------------------------------------");
+		if(once==false){
+			Map<String, Integer> association = md.getAssociationMap();
+			out=out+"\n----- Query Symbol Association -----\n\n";
+			out=out+association.toString()+"\n";
+			once=true;
+		}
 		
 		//Printing the input log splitted in chunck
-		view.printTrainingOutput("\n----- Chunck of input Log -----\n");
+		out=out+"\n----- Chunck of input Log -----\n\n";
 		 Map<Integer, List<Integer>> chunck = md.getChunckMap();
 		 for(int j=0; j<chunck.size(); j++){
-			 view.printTrainingOutput(chunck.get(j).toString());
+			 out=out+chunck.get(j).toString()+"\n";
 		 }
-		 view.printTrainingOutput("\n------------------------------------------------");
 		
 		// Launching PrefixSpan Algorithm..
-		view.printTrainingOutput("\nLaunching PrefixSpan Algorithm..\n");
 		String[] arg = new String[3];
 		arg[0]="C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan_"+count+".txt";
 		arg[1]="C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\outputPrefixSpan_"+count+".txt";
 		arg[2]=Double.toString(inSup);
 		MainTestPrefixSpan_saveToFile.main(arg);
-		view.printTrainingOutput("Sequential pattern search done.\n");
 		
 		// Parsing PrefixSPan Output
 		/* Now I have to parse outputPrefixSpan.txt in order to retrieve the frequent sequential patter that I need (the ones that
@@ -163,9 +162,11 @@ public class AidaController {
 		md.findSP(sp.get(sp.size()-1));
 		model.add(md);
 		
-		view.printTrainingOutput("----- Enriched Sequential Pattern Found -----\n");
+		//out=out+"\n----- Enriched Sequential Pattern Found -----\n\n";
+		view.printOutputLabel(out);
+		System.out.println(out);
 		for(int i=0; i<sp.get(count).size(); i++){
-			view.printTrainingOutput(sp.get(sp.size()-1).get(i).toString()+"\n");
+			view.printSequentialPattern(sp.get(sp.size()-1).get(i));
 		}
 	}
 	

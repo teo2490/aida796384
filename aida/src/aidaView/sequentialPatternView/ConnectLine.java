@@ -3,6 +3,7 @@ package aidaView.sequentialPatternView;
 import java.awt.*;
 import java.awt.geom.Point2D;
 
+
 /**
  * The class represents base line model and rendering according to multiple params.
  *
@@ -12,7 +13,8 @@ import java.awt.geom.Point2D;
  * @version 1.0
  */
 public class ConnectLine {
-    public static final int LINE_TYPE_SIMPLE = 0;
+
+	public static final int LINE_TYPE_SIMPLE = 0;
     public static final int LINE_TYPE_RECT_1BREAK = 1;
     public static final int LINE_TYPE_RECT_2BREAK = 2;
 

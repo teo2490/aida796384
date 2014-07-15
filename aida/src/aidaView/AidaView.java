@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
 import java.awt.Color;
@@ -58,6 +59,7 @@ import java.awt.Insets;
 import javax.swing.JTable;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
+import javax.swing.UIManager;
 
 
 /*** 
@@ -92,7 +94,6 @@ public class AidaView {
 	private JFileChooser fc;
 	private JTabbedPane tabbedPane;
 	private JPanel outputPanel;
-	private JTextArea outputTextArea;
 	private JButton btnStart;
 	private JLabel errorLabel;
 	private JTextArea flowingQueriesArea;
@@ -132,6 +133,9 @@ public class AidaView {
 	private File file;
 	private List<String> removed;
 	private int currentNumRow = 1;
+	private JTextArea outputLabel;
+	private JPanel spPanel;
+	private JScrollPane outputScrollPanel;
 	
 	/**
 	 * Launch the application.
@@ -483,9 +487,10 @@ public class AidaView {
         		numQueryText.setText("");
         		numTimestampText.setText("");
         		dtm.setRowCount(0);
-        		outputTextArea.setText("");
+        		outputLabel.setText("");
         		currentNumRow=1;
         		removed.clear();
+        		spPanel.removeAll();
         	}
         });
         
@@ -504,16 +509,37 @@ public class AidaView {
         btnStart.setEnabled(false);
         
         outputPanel = new JPanel();
+
         outputPanel.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-        outputPanel.setBackground(Color.WHITE);
-        JScrollPane outputScrollPanel = new JScrollPane(outputPanel);
+        outputPanel.setBackground(UIManager.getColor("Panel.background"));
+        GridBagLayout gbl_outputPanel = new GridBagLayout();
+        gbl_outputPanel.columnWidths = new int[]{420, 0};
+        gbl_outputPanel.rowHeights = new int[]{14, 541, 0, 0};
+        gbl_outputPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+        gbl_outputPanel.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
+        outputPanel.setLayout(gbl_outputPanel);
         
-        outputTextArea = new JTextArea();
-        outputTextArea.setEditable(false);
-        outputPanel.add(outputTextArea);
-        outputScrollPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        outputLabel = new JTextArea("");
+        outputLabel.setLineWrap(true);
+        outputLabel.setEditable(false);
+        outputLabel.setBackground(UIManager.getColor("Panel.background"));
+        GridBagConstraints gbc_outputLabel = new GridBagConstraints();
+        gbc_outputLabel.fill = GridBagConstraints.HORIZONTAL;
+        gbc_outputLabel.anchor = GridBagConstraints.NORTHWEST;
+        gbc_outputLabel.insets = new Insets(0, 0, 5, 0);
+        gbc_outputLabel.gridx = 0;
+        gbc_outputLabel.gridy = 0;
+        outputPanel.add(outputLabel, gbc_outputLabel);
+        outputScrollPanel = new JScrollPane(outputPanel);
+        
+        spPanel = new JPanel();
+        GridBagConstraints gbc_spPanel = new GridBagConstraints();
+        gbc_spPanel.fill = GridBagConstraints.BOTH;
+        gbc_spPanel.gridx = 0;
+        gbc_spPanel.gridy = 1;
+        outputPanel.add(spPanel, gbc_spPanel);
+        spPanel.setLayout(new BoxLayout(spPanel, BoxLayout.Y_AXIS));
         trainingPanel.add(outputScrollPanel);
-        
         //trainingPanel.add(panel);
         return trainingPanel;
     }
@@ -656,8 +682,52 @@ public class AidaView {
 		return stopFlowBtn;
 	}
     
-    public void printTrainingOutput(String s){
-    	outputTextArea.append(s+"\n");
+//    public void printTrainingOutput(String s){
+//    	outputTextArea.append(s+"\n");
+//    }
+    
+    public void printOutputLabel(String s){
+    	outputLabel.setText(s);
+    }
+    
+	public ConnectorContainer printSequentialPattern(final SequentialPattern sp){
+    	JConnector[] connectors = new JConnector[sp.getNumberOfEdges()];
+    	JPanel pp = new JPanel();
+    	pp.setLayout(new BoxLayout(pp, BoxLayout.X_AXIS));
+    	JButton openS = new JButton();
+    	openS.setText("See complete SP");
+    	openS.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		JOptionPane.showMessageDialog(frmAidaAutomatic, "node1 |mean # tolerance| node2\n\n"+sp.toString());
+            }
+        });
+    	ConnectorContainer cc = new ConnectorContainer(connectors);
+    	cc.setLayout(new FlowLayout(FlowLayout.LEADING));
+        //cc.setLayout(null);
+        JLabel[] b2 = new JLabel[sp.getNumberOfNodes()];
+        b2[0]=new JLabel("  q"+sp.getNode(0));
+        b2[0].setBounds(0, 10, 30, 30);
+        b2[0].setBorder(new EtchedBorder());
+        b2[0].setOpaque(true);
+        cc.add(b2[0]);
+        for(int j=1; j<sp.getNumberOfNodes(); j++){
+        	b2[j]=new JLabel("  q"+sp.getNode(j));
+            b2[j].setBounds(50*(j), 10, 30, 30);
+            b2[j].setBorder(new EtchedBorder());
+        	connectors[j-1] = new JConnector(b2[j-1], b2[j], ConnectLine.LINE_ARROW_NONE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
+        	cc.add(b2[j]);
+        }
+        cc.setLabels(b2);
+        cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+        //cc.setMinimumSize(new Dimension(80, 50));
+        pp.add(cc);
+        pp.add(openS);
+        spPanel.add(pp);
+        spPanel.revalidate();
+        spPanel.repaint();
+        outputScrollPanel.revalidate();
+        outputScrollPanel.repaint();
+        return cc;
     }
     
     public void printForecastingQueries(String s){
