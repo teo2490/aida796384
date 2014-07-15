@@ -3,8 +3,10 @@ package aidaController;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import exception.InvalidSequentialPatternException;
 
@@ -135,7 +137,17 @@ public class AidaController {
 		if(once==false){
 			Map<String, Integer> association = md.getAssociationMap();
 			out=out+"\n----- Query Symbol Association -----\n\n";
-			out=out+association.toString()+"\n";
+			//out=out+association.toString()+"\n";
+			Set<String> set = association.keySet();
+			Iterator<String> next = set.iterator();
+			String p = next.next();
+			out=out+p+" = "+association.get(p)+"\n";
+			for(int i=0; i<=set.size(); i++){				
+				if(next.hasNext()){
+					p=next.next();
+					out=out+p+" = "+association.get(p)+"\n";
+				}
+			}
 			once=true;
 		}
 		

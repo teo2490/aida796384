@@ -515,7 +515,7 @@ public class AidaView {
         GridBagLayout gbl_outputPanel = new GridBagLayout();
         gbl_outputPanel.columnWidths = new int[]{420, 0};
         gbl_outputPanel.rowHeights = new int[]{14, 541, 0, 0};
-        gbl_outputPanel.columnWeights = new double[]{1.0, Double.MIN_VALUE};
+        gbl_outputPanel.columnWeights = new double[]{0.0, Double.MIN_VALUE};
         gbl_outputPanel.rowWeights = new double[]{0.0, 0.0, 1.0, Double.MIN_VALUE};
         outputPanel.setLayout(gbl_outputPanel);
         
@@ -698,7 +698,13 @@ public class AidaView {
     	openS.setText("See complete SP");
     	openS.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
-        		JOptionPane.showMessageDialog(frmAidaAutomatic, "node1 |mean # tolerance| node2 |..\n\n"+sp.toString(), 
+        		String g = "";
+        		int num = sp.getNumberOfNodes();
+        		for(int i=0; i<num; i++){
+        			g = g+"node"+i+" |mean"+i+" # tolerance"+i+"| ";
+        		}
+        		g = g+"node"+num+"\n\n";
+        		JOptionPane.showMessageDialog(frmAidaAutomatic, g+sp.toString(), 
         				"Complete Sequential Pattern", JOptionPane.INFORMATION_MESSAGE);
             }
         });
