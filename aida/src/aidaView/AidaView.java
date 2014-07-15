@@ -698,7 +698,8 @@ public class AidaView {
     	openS.setText("See complete SP");
     	openS.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
-        		JOptionPane.showMessageDialog(frmAidaAutomatic, "node1 |mean # tolerance| node2\n\n"+sp.toString());
+        		JOptionPane.showMessageDialog(frmAidaAutomatic, "node1 |mean # tolerance| node2 |..\n\n"+sp.toString(), 
+        				"Complete Sequential Pattern", JOptionPane.INFORMATION_MESSAGE);
             }
         });
     	ConnectorContainer cc = new ConnectorContainer(connectors);
