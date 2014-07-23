@@ -439,9 +439,9 @@ public class SequentialPattern {
 		String s = node.get(0).toString();
 			if(node.size()>1){
 				for(int i=1; i<node.size()-1; i++){
-					s=s+" |"+edge.get(i-1).getDuration()+"#"+edge.get(i-1).getVariance()+"| "+node.get(i);
+					s=s+" | "+edge.get(i-1).getDuration()/1000+" # "+edge.get(i-1).getVariance()/1000+" | "+node.get(i);
 				}
-				s=s+" |"+edge.get(edge.size()-1).getDuration()+"#"+edge.get(edge.size()-1).getVariance()+"| "+node.get(node.size()-1);
+				s=s+" | "+edge.get(edge.size()-1).getDuration()/1000+" # "+edge.get(edge.size()-1).getVariance()/1000+" | "+node.get(node.size()-1);
 			}
 			s=s+" - @SUP: "+sup;
 		return s;

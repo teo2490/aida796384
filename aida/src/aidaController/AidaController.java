@@ -133,9 +133,9 @@ public class AidaController {
 				"C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan_"+count+".txt",
 				teQuery);	 
 		
+		Map<String, Integer> association = md.getAssociationMap();
 		//Printing association between string queries and their symbols
 		if(once==false){
-			Map<String, Integer> association = md.getAssociationMap();
 			out=out+"\n----- Query Symbol Association -----\n\n";
 			//out=out+association.toString()+"\n";
 			Set<String> set = association.keySet();
@@ -152,7 +152,7 @@ public class AidaController {
 		}
 		
 		//Printing the input log splitted in chunck
-		out=out+"\n----- Chunck of input Log -----\n\n";
+		out=out+"\n----- Chunck of input Log of query "+association.get(teQuery)+" -----\n\n";
 		 Map<Integer, List<Integer>> chunck = md.getChunckMap();
 		 for(int j=0; j<chunck.size(); j++){
 			 out=out+chunck.get(j).toString()+"\n";

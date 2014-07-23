@@ -698,12 +698,12 @@ public class AidaView {
     	openS.setText("See complete SP");
     	openS.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
-        		String g = "";
         		int num = sp.getNumberOfNodes();
-        		for(int i=0; i<num; i++){
-        			g = g+"node"+i+" |mean"+i+" # tolerance"+i+"| ";
+        		String g = "node0";
+        		for(int i=1; i<num; i++){
+        			g = g+" |mean"+i+" # tolerance"+i+"| node"+i;
         		}
-        		g = g+"node"+num+"\n\n";
+        		g = g+"\n\n";
         		JOptionPane.showMessageDialog(frmAidaAutomatic, g+sp.toString(), 
         				"Complete Sequential Pattern", JOptionPane.INFORMATION_MESSAGE);
             }
