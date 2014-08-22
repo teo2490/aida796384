@@ -102,16 +102,17 @@ public class Edge {
 	        long max=0;
 	        for(int j=0; j<instancesDuration.size() ; j++){
 	        	if(instancesDuration.get(j)<min)	min=instancesDuration.get(j);
-	        	else if(instancesDuration.get(j)<max)	max=instancesDuration.get(j);
+	        	//< ??
+	        	else if(instancesDuration.get(j)>max)	max=instancesDuration.get(j);
 	        }
 	        
-	        float diff1=duration- (float) min;
-	        float diff2=(float)max-duration;
+//	        float diff1=duration- (float) min;
+//	        float diff2=(float)max-duration;
+//	        
+//	        if(diff1>diff2)	variance=diff1;
+//	        else	variance=diff2;
 	        
-	        if(diff1>diff2)	variance=diff1;
-	        else	variance=diff2;
-	        
-	        
+	        variance = (max-min)/2 + 1;
 		}
 	}
 	
