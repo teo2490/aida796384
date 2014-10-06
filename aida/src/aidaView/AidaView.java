@@ -340,21 +340,28 @@ public class AidaView {
 						e.printStackTrace();
 					}
         			String line = "";
-        			String cvsSplitBy = ", ";
+        			//NB. It has to be changed also in Manager.java
+        			String cvsSplitBy = "\t";
         			//int i=0;
 					try {
 						while ((line = br.readLine()) != null) {        				
 							// use comma as separator
 							String[] token = line.split(cvsSplitBy);
-							System.out.println(!m.contains(token[numQuery]));
-							System.out.println(token[numQuery]);
-							if(!m.contains(token[numQuery]))	m.add(token[numQuery]);
-							//i++;
+							//System.out.println(!m.contains(token[numQuery]));
+							//System.out.println(token[numQuery]);
+							try{
+								if(!m.contains(token[numQuery]))	m.add(token[numQuery]);
+								//i++;
+							} catch (ArrayIndexOutOfBoundsException e){
+								errorLabel.setText("Wrong Input.");
+								System.out.println("Wrong Input.");
+							}
 						}
-					} catch (IOException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
+						errorLabel.setText("Wrong Input.");
 					}
-					errorLabel.setText("");
+					//errorLabel.setText("");
                     @SuppressWarnings({ "rawtypes", "unchecked" })
 					final JComboBox qm = new JComboBox(m.toArray());
                     removed = new ArrayList<String>();
@@ -431,8 +438,8 @@ public class AidaView {
         inputFile.add(lblInputLogFile, gbc_lblInputLogFile);
         
         errorLabel = new JLabel("");
+        errorLabel.setAlignmentX(0.5f);
         errorLabel.setHorizontalAlignment(SwingConstants.TRAILING);
-        errorLabel.setAlignmentY(Component.TOP_ALIGNMENT);
         errorLabel.setVerticalAlignment(SwingConstants.TOP);
         inputPanel.add(errorLabel);
         errorLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -491,6 +498,7 @@ public class AidaView {
         		currentNumRow=1;
         		removed.clear();
         		spPanel.removeAll();
+        		errorLabel.setText("");
         	}
         });
         
@@ -842,5 +850,16 @@ public class AidaView {
     	return inputLog;
 	}
     
+    public int getInputQueryPos(){
+    	String temp = numQueryText.getText();
+    	int qpos = Integer.parseInt(temp);
+    	return qpos;
+    }
+    
+    public int getInputTimestampPos(){
+    	String temp = numTimestampText.getText();
+    	int tpos = Integer.parseInt(temp);
+    	return tpos;
+    }
 }
 

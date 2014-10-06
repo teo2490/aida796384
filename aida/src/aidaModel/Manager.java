@@ -55,11 +55,23 @@ public class Manager {
 	ArrayList<Date> timestampList;
 	Map<Integer, List<Date>> timestampMap;
 	//Constant that indicates the position of the query in a row of the log
-	static final int QUERYPOS = 1;
+	int QUERYPOS;
 	//Constant that indicates the position of the timestamp of the current query in a row of the log
-	static final int TSPOS = 2;	  
+	int TSPOS;	  
 	int idTE = -1; //Initialized to an invalid value
-	 
+	
+	
+	public Manager() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Manager(int q, int t) {
+		super();
+		QUERYPOS=q;
+		TSPOS=t;
+	}
+
 	/**
 	 * This method reads a CSV file and create a TXT file with a predefined structure.
 	 * In the TXT file there is not reported the text query, but at each type of query is associated an ID used in the TXT file
@@ -81,7 +93,8 @@ public class Manager {
 		//----
 		BufferedReader br = null;
 		String line = "";
-		String cvsSplitBy = ", ";
+		//NB. It has to be changed also in AidaView.java
+		String cvsSplitBy = "\t";
 		//The incremental identifier
 		int key = 0;
         PrintStream outWriter = new PrintStream(output);

@@ -53,6 +53,9 @@ public class AidaController {
 	private String out="";
 	private boolean once = false;
 	
+	private int qpos;
+	private int tpos;
+	
 	public AidaController(AidaView v){
 		this.view = v;
 		this.running=false;
@@ -127,7 +130,9 @@ public class AidaController {
 	 * @throws Exception
 	 */
 	public void training(String inLog, String teQuery, Double inSup, int count) throws Exception{
-		Manager md = new Manager();
+		qpos = view.getInputQueryPos();
+		tpos = view.getInputTimestampPos();
+		Manager md = new Manager(qpos, tpos);
 		//Parsing the CSV input 
 		md.parseCSVtoTXT(inLog,
 				"C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan_"+count+".txt",
@@ -209,6 +214,9 @@ public class AidaController {
 		t = new Thread(){
 			public void run(){
 				int q = -1;
+				
+				initiater.getSet();
+
 				while(running){
 					try {
 						Thread.sleep(1000);

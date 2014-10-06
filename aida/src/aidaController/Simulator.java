@@ -1,5 +1,6 @@
 package aidaController;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -39,6 +40,7 @@ public class Simulator {
 	Random randomGenerator = new Random();
 	int seed=0;
 	AidaView view;
+	ResultSet rs;
 	
 	/**
 	 * Constructor with parameter.
@@ -58,6 +60,35 @@ public class Simulator {
     public void addListener(QueryListener toAdd) {
         listeners.add(toAdd);
     }
+    
+    public void getSet(){
+    	String dbURL = "jdbc:mysql://localhost:3306/auditel";
+        String username ="root";
+        String password = "pizzamysql";
+       
+        Connection dbCon = null;
+        Statement stmt = null;
+        rs = null;
+
+        String query ="SELECT emittente FROM auditel.individuals_syntonizations_live WHERE user=5";
+        
+        try {
+            //getting database connection to MySQL server
+            dbCon = DriverManager.getConnection(dbURL, username, password);
+           
+            //getting PreparedStatment to execute query
+            stmt = dbCon.prepareStatement(query);
+           
+            //Resultset returned by query
+            rs = stmt.executeQuery(query);
+            rs.beforeFirst();
+        } catch (SQLException ex) {
+        	ex.printStackTrace();
+            System.out.println("SQL Exception!");
+        } finally{
+           //close connection ,stmt and resultset here
+        }
+    }
 
     /**
      * This method generates random queries with random interval between two of them.
@@ -66,12 +97,29 @@ public class Simulator {
      * @throws InvalidSequentialPatternException
      */
     public int makeQuery() throws InterruptedException, InvalidSequentialPatternException {
-    	
-    	
-    	int randomInt = randomGenerator.nextInt(seed);
-    	
-    	Thread.sleep(randomInt*1000*2);
-    	
+
+        int randomInt = -1;
+        int emittente = -1;
+        
+        try {
+	        if(rs.next()){
+		        emittente = rs.getInt(1);
+		         
+		        randomInt = randomGenerator.nextInt(seed);
+		        Thread.sleep(randomInt*1000*2);
+		         
+		        // Notify everybody that may be interested.
+		        for (QueryListener hl : listeners){
+		        	System.out.println("Emittente "+emittente+" eseguita!");
+		        	hl.someoneMadeQuery(emittente);
+		        } 
+	        }
+        } catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+    	/*
     	if(randomInt==0)	randomInt=randomInt+1;
     	
         //System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
@@ -79,36 +127,8 @@ public class Simulator {
         for (QueryListener hl : listeners){
         	hl.someoneMadeQuery(randomInt);
         }
-        
-        return randomInt;
-    	/*
-        //Another body for makeQuery() function for ad-hoc testing purposes
-    	for (QueryListener hl : listeners){
-    		System.out.println("Query 4 executed! @ "+System.nanoTime());
-    		hl.someoneMadeQuery(4);
-    	}
-    	//Thread.sleep(50000);
-    	for (QueryListener hl : listeners){
-    		System.out.println("Query 4 executed! @ "+System.nanoTime());
-    		hl.someoneMadeQuery(4);
-    	}
-    	//Thread.sleep(50000);
-    	for (QueryListener hl : listeners){
-    		System.out.println("Query 3 executed! @ "+System.nanoTime());
-    		hl.someoneMadeQuery(3);
-    	}
-    	//Thread.sleep(50000);
-    	for (QueryListener hl : listeners){
-    		System.out.println("Query 4 executed! @ "+System.nanoTime());
-    		hl.someoneMadeQuery(4);
-    	}
-    	
-    	for (QueryListener hl : listeners){
-    		System.out.println("Query 1 executed! @ "+System.nanoTime());
-    		hl.someoneMadeQuery(1);
-    	}
-    	return 4;
-    	*/
+        */
+        return emittente;
     }
 }
 
