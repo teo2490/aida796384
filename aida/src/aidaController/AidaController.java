@@ -14,6 +14,7 @@ import prefixspan.MainTestPrefixSpan_saveToFile;
 
 import aidaModel.Manager;
 import aidaModel.SequentialPattern;
+import aidaModel.TeQueriesState;
 import aidaView.AidaView;
 
 
@@ -56,10 +57,13 @@ public class AidaController {
 	private int qpos;
 	private int tpos;
 	
+	private TeQueriesState teqState;
+	
 	public AidaController(AidaView v){
 		this.view = v;
 		this.running=false;
 		model = new ArrayList<Manager>();
+		teqState = new TeQueriesState();
 		
 		inSup = new ArrayList<Double>();
 		inTime = new ArrayList<Integer>();
@@ -81,6 +85,7 @@ public class AidaController {
 	        		try {
 	        			//Start the training ////////devo recuperare la teQuery
 	        			for(int i=0; i<teQueryList.size(); i++){
+	        				//Start the training phase for each teQuery
 	        				training(inLog, teQueryList.get(i), inSup.get(i), i);
 	        			}
 	        			out=out+"\n----- Enriched Sequential Pattern Found -----\n";
@@ -139,6 +144,10 @@ public class AidaController {
 				teQuery);	 
 		
 		Map<String, Integer> association = md.getAssociationMap();
+		
+		//Set the state for each teQuery
+		teqState.addTeQuery(association.get(teQuery));
+		
 		//Printing association between string queries and their symbols
 		if(once==false){
 			out=out+"\n----- Query Symbol Association -----\n\n";
@@ -205,7 +214,7 @@ public class AidaController {
 		final Simulator initiater = new Simulator(5, view);
 		
 		for(int i=0; i<sp.size(); i++){
-			Listener r1 = new Listener(sp.get(i), inTime.get(i), view);
+			Listener r1 = new Listener(sp.get(i), inTime.get(i), view, teqState);
 			initiater.addListener(r1);
 		}
 

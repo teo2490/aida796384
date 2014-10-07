@@ -394,6 +394,14 @@ public class SequentialPattern {
 	}
 	
 	/**
+	 * This method returns the last query of the sp (in fact, the teQuery)
+	 * @return
+	 */
+	public int getTeQuery(){
+		return node.get(node.size()-1);
+	}
+	
+	/**
 	 * AUTO-GENERATED hashCode method
 	 * @see java.lang.Object#hashCode()
 	 */

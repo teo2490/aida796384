@@ -6,6 +6,7 @@ import java.util.List;
 import exception.InvalidSequentialPatternException;
 
 import aidaModel.SequentialPattern;
+import aidaModel.TeQueriesState;
 import aidaView.AidaView;
 
 
@@ -44,12 +45,14 @@ public class Listener implements QueryListener  {
 	private float timeForCreation;
 	
 	AidaView view;
+	private TeQueriesState teqState;
 	
-	public Listener(List<SequentialPattern> sp, float t, AidaView v){
+	public Listener(List<SequentialPattern> sp, float t, AidaView v, TeQueriesState teqState){
 		this.sp=sp;
 		timeForCreation=t;
 		view=v;
 		spOnGoing = new ArrayList<SequentialPattern>();
+		this.teqState=teqState;
 	}
 	
 	/**
@@ -70,6 +73,12 @@ public class Listener implements QueryListener  {
 		int pos=-1;
 		
 		System.out.println("Someone MADES a QUERY an spOnGoing size is: "+spOnGoing.size());
+		
+		//Check if the flowing query is the teQuery
+		if(q==sp.get(0).getTeQuery()){
+			//Increment occurences number
+			teqState.incrementAppearanceNumber(q);
+		}
 		
 		//It checks the partially recognized sequential pattern list.
         if(spOnGoing.size()>0){
@@ -103,7 +112,9 @@ public class Listener implements QueryListener  {
 		        			//if(sp.get(pos).isScheduled()==false){
 		        				view.printForecastingResponse("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
 		        				view.validateSpInList(spOnGoing.get(spOnGoing.size()-1));
+		        				
 		        				sp.get(pos).schedule();
+		        				teqState.createIndex(sp.get(pos).getTeQuery());
 		        				//spOnGoing.get(spOnGoing.size()-1).schedule();
 		        			//}
 		        		} else {
@@ -145,7 +156,9 @@ public class Listener implements QueryListener  {
         			if(sp.get(pos).isScheduled()==false){
         				view.printForecastingResponse("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
         				view.validateSpInList(spOnGoing.get(spOnGoing.size()-1)); 
+        				
         				sp.get(pos).schedule();
+        				teqState.createIndex(sp.get(pos).getTeQuery());
         			} 
         		} else {
     				view.addSpToList(sp.get(i));
