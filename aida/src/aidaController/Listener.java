@@ -78,6 +78,7 @@ public class Listener implements QueryListener  {
 		if(q==sp.get(0).getTeQuery()){
 			//Increment occurences number
 			teqState.incrementAppearanceNumber(q);
+			if(teqState.indexIsSet(q))	teqState.removeIndex(q);	//If the teQuery is executed and index is set, then the index is removed.
 		}
 		
 		//It checks the partially recognized sequential pattern list.

@@ -97,8 +97,9 @@ public class Simulator {
      * @throws InvalidSequentialPatternException
      */
     public int makeQuery() throws InterruptedException, InvalidSequentialPatternException {
-
+    	
         int randomInt = -1;
+        
         int emittente = -1;
         
         try {
@@ -118,8 +119,10 @@ public class Simulator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-    	/*
+	
+        /*
+    	randomInt = randomGenerator.nextInt(seed);
+        Thread.sleep(randomInt*1000*2);
     	if(randomInt==0)	randomInt=randomInt+1;
     	
         //System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
@@ -127,6 +130,8 @@ public class Simulator {
         for (QueryListener hl : listeners){
         	hl.someoneMadeQuery(randomInt);
         }
+        
+        return randomInt;
         */
         return emittente;
     }

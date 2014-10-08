@@ -120,10 +120,14 @@ public class AidaController {
 		
 		view.getStopFlowBtn().addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
-        		running=false;
-        		view.clearForecastingQueries();
-        		view.clearForecastingOutput();
-        		view.clearForecastingSpView();
+        		if(running==false){
+	        		view.clearForecastingQueries();
+	        		view.clearForecastingOutput();
+	        		view.clearForecastingSpView();
+        		} else {
+        			running=false;
+        		}
+        		teqState.paintRecall();
         	}
         });
 	}
@@ -224,6 +228,8 @@ public class AidaController {
 			public void run(){
 				int q = -1;
 				
+				int count = 0;
+				
 				initiater.getSet();
 
 				while(running){
@@ -232,6 +238,11 @@ public class AidaController {
 						if(running){
 							q = initiater.makeQuery();
 							view.printForecastingQueries("Query "+q+" executed! @ "+System.nanoTime());
+							count++;
+							if(count==10){
+								teqState.computePartialRecall();
+								count=0;
+							}
 						}
 					} catch (InterruptedException | InvalidSequentialPatternException e) {
 						e.printStackTrace();

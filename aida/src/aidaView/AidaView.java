@@ -32,7 +32,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +50,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JComboBox;
 import javax.swing.BoxLayout;
-import java.awt.Component;
 import javax.swing.SwingConstants;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -342,6 +340,7 @@ public class AidaView {
         			String line = "";
         			//NB. It has to be changed also in Manager.java
         			String cvsSplitBy = "\t";
+        			//String cvsSplitBy = ", ";
         			//int i=0;
 					try {
 						while ((line = br.readLine()) != null) {        				

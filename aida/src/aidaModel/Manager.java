@@ -95,6 +95,7 @@ public class Manager {
 		String line = "";
 		//NB. It has to be changed also in AidaView.java
 		String cvsSplitBy = "\t";
+		//String cvsSplitBy = ", ";
 		//The incremental identifier
 		int key = 0;
         PrintStream outWriter = new PrintStream(output);

@@ -8,6 +8,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -23,8 +26,22 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 public class GraphDesigner {
 	
-	public GraphDesigner(int p[][], int r[][]){
+	public GraphDesigner(Map<Integer, ArrayList<Float>> v){
+		Set<Integer> keySet = v.keySet();
+		XYSeriesCollection dataset = new XYSeriesCollection();
 		
+		for(Integer key:keySet){
+			// Create a simple XY chart
+			XYSeries series = new XYSeries("Recall"+key);
+			for(int i=0; i<v.get(key).size(); i++){
+				series.add(i*10, v.get(key).get(i));
+			}
+			//Insert series in dataset
+			
+			dataset.addSeries(series);
+		}
+		
+		paintRecallGrahp(dataset);
 	}
 	/*
 	public static void main(String[] args) {

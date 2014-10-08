@@ -1,7 +1,11 @@
 package aidaModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
+import aidaView.GraphDesigner;
 
 public class TeQueriesState {
 
@@ -15,12 +19,18 @@ public class TeQueriesState {
 	//teQuery execution forecasted and teQuery NOT executed
 	private Map<Integer, Integer> teqBadPrevisionCounter;
 	
+	private Map<Integer, ArrayList<Float>> precisionValues;
+	private Map<Integer, ArrayList<Float>> recallValues;
+	
 	public TeQueriesState() {
 		super();
-		teqCount = new HashMap<Integer, Integer>();
+		teqCount = new HashMap<Integer, Integer>(); //Denominatore Recall
 		teqIndex = new HashMap<Integer, Boolean>();
-		teqGoodPrevisionCounter = new HashMap<Integer, Integer>();
-		teqBadPrevisionCounter = new HashMap<Integer, Integer>();
+		teqGoodPrevisionCounter = new HashMap<Integer, Integer>(); //Numeratore Precision e Numeratore Recall
+		teqBadPrevisionCounter = new HashMap<Integer, Integer>(); 
+		
+		precisionValues = new HashMap<Integer, ArrayList<Float>>();
+		recallValues = new HashMap<Integer, ArrayList<Float>>();
 	}
 
 	/**
@@ -90,6 +100,21 @@ public class TeQueriesState {
 		teqIndex.put(teQuery, false);
 		teqGoodPrevisionCounter.put(teQuery, 0);
 		teqBadPrevisionCounter.put(teQuery, 0);
+		
+		ArrayList<Float> r = new ArrayList<Float>();
+		recallValues.put(teQuery, r);
+		
+		ArrayList<Float> p = new ArrayList<Float>();
+		precisionValues.put(teQuery, p);
+	}
+	
+	/**
+	 * This method says if index for a teQuery q is already set or not.
+	 * @param q
+	 * @return
+	 */
+	public boolean indexIsSet(int q){
+		return teqIndex.get(q);
 	}
 	
 	/**
@@ -118,4 +143,22 @@ public class TeQueriesState {
 		if(teqIndex.get(teQuery)==true)	teqGoodPrevisionCounter.put(teQuery, teqGoodPrevisionCounter.get(teQuery)+1);
 	}
 	
+	public void computePartialRecall(){
+		Set<Integer> keySet = teqCount.keySet();
+		for(Integer key:keySet){
+			 //Computing partial recall
+		     float r = teqGoodPrevisionCounter.get(key) / teqCount.get(key);
+		     recallValues.get(key).add(r);
+		     //reset values
+		     teqCount.put(key, 0);
+		     teqIndex.put(key, false);
+		     teqGoodPrevisionCounter.put(key, 0);
+		     teqBadPrevisionCounter.put(key, 0);
+		}
+	}
+	
+	public void paintRecall(){
+		@SuppressWarnings("unused")
+		GraphDesigner d = new GraphDesigner(recallValues);
+	}
 }
