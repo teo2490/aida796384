@@ -34,7 +34,7 @@ public class GraphDesigner {
 			// Create a simple XY chart
 			XYSeries series = new XYSeries("Recall"+key);
 			for(int i=0; i<v.get(key).size(); i++){
-				series.add(i*10, v.get(key).get(i));
+				series.add(i*3, v.get(key).get(i));
 			}
 			//Insert series in dataset
 			
@@ -115,7 +115,7 @@ public class GraphDesigner {
 			"recall", // y-axis Label
 			dataset, // Dataset
 			PlotOrientation.VERTICAL, // Plot Orientation
-			false, // Show Legend
+			true, // Show Legend
 			true, // Use tooltips
 			false // Configure chart to generate URLs?
 			);
@@ -139,7 +139,7 @@ public class GraphDesigner {
 			Frame frame = new Frame();
 			frame.addWindowListener(new WindowAdapter(){
 				  public void windowClosing(WindowEvent we){
-				  System.exit(0);
+					  System.exit(0);
 				  }
 			});
 			ChartPanel panel = new ChartPanel(chart);

@@ -78,29 +78,36 @@ public class Listener implements QueryListener  {
 		if(q==sp.get(0).getTeQuery()){
 			//Increment occurences number
 			teqState.incrementAppearanceNumber(q);
-			if(teqState.indexIsSet(q))	teqState.removeIndex(q);	//If the teQuery is executed and index is set, then the index is removed.
+			//If the teQuery is executed and index is set, then the index is removed.
+			if(teqState.indexIsSet(q)){
+				teqState.removeIndex(q);	
+				
+//				for(SequentialPattern s: sp){
+//					s.unschedule();
+//				}
+			}
 		}
 		
 		//It checks the partially recognized sequential pattern list.
         if(spOnGoing.size()>0){
 	        for(int j=0; j<spOnGoing.size();j++){
 	        	SequentialPattern currentSp = spOnGoing.get(j);
-	        	System.out.println("1CHECK: "+(currentSp.getNextNodeToCheck() < currentSp.getNumberOfNodes()));
+	        	//System.out.println("1CHECK: "+(currentSp.getNextNodeToCheck() < currentSp.getNumberOfNodes()));
 	        	//System.out.println("2CHECK: "+(currentSp.getNode(currentSp.getNextNodeToCheck()) == q));
 	        	if(currentSp.getNextNodeToCheck() < currentSp.getNumberOfNodes() && currentSp.getNode(currentSp.getNextNodeToCheck()) == q){
-	        		System.out.println(currentSp.toString()+" SI");
+	        		//System.out.println(currentSp.toString()+" SI");
 	        		currentSp.incrementNextNodeToCheck(); 
 	        		currentSp.setLastCheck(time);
-	        		System.out.println("CHECK: "+checkValidity(currentSp, time));
+	        		//System.out.println("CHECK: "+checkValidity(currentSp, time));
 	        		//If the queries is the next of a partial sp (that is yet valid due to time constraint), it is copied, 
 	        		//updated and added to the list of partial sp
 	        		if(checkValidity(currentSp, time)==true && typeAlreadyScheduled(currentSp)==false){
-	        			System.out.println("DENTRO");
+	        			//System.out.println("DENTRO");
 		        		SequentialPattern newSP = currentSp.cloneSP();
 		        		//newSP.incrementNextNodeToCheck(); 
 		        		//newSP.setLastCheck(time);
 		        		spOnGoing.add(newSP);
-		        		System.out.println(newSP.toString()+" ADDED");
+		        		//System.out.println(newSP.toString()+" ADDED");
 		        		//If the remaining time of a sp (the sum of its remaining edges duration without considering the
 		        		//next edge to check) is lower than the time needed for index creation, it is removed from the list
 		        		//of partial sp and the index creation is scheduled
@@ -114,7 +121,7 @@ public class Listener implements QueryListener  {
 		        				view.printForecastingResponse("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
 		        				view.validateSpInList(spOnGoing.get(spOnGoing.size()-1));
 		        				
-		        				sp.get(pos).schedule();
+		        				//sp.get(pos).schedule();
 		        				teqState.createIndex(sp.get(pos).getTeQuery());
 		        				//spOnGoing.get(spOnGoing.size()-1).schedule();
 		        			//}
@@ -146,7 +153,7 @@ public class Listener implements QueryListener  {
         	if(sp.get(i).getNode(0) == q && sp.get(i).isScheduled()==false){
         		//Updated both the sp list of the controller and the sp list of the view
         		spOnGoing.add(sp.get(i));
-        		System.out.println("SIZE: "+spOnGoing.size());
+        		//System.out.println("SIZE: "+spOnGoing.size());
         		spOnGoing.get(spOnGoing.size()-1).setLastCheck(time);
         		//If yhe time needed to implement indexes is less then the remaining time of the sp, 
         		//the index creation is scheduled
@@ -158,7 +165,7 @@ public class Listener implements QueryListener  {
         				view.printForecastingResponse("INDEX SCHEDULING FOR: "+spOnGoing.get(spOnGoing.size()-1).toString()+" @ "+time);
         				view.validateSpInList(spOnGoing.get(spOnGoing.size()-1)); 
         				
-        				sp.get(pos).schedule();
+        				//sp.get(pos).schedule();
         				teqState.createIndex(sp.get(pos).getTeQuery());
         			} 
         		} else {

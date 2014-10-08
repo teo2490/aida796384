@@ -146,14 +146,16 @@ public class TeQueriesState {
 	public void computePartialRecall(){
 		Set<Integer> keySet = teqCount.keySet();
 		for(Integer key:keySet){
-			 //Computing partial recall
-		     float r = teqGoodPrevisionCounter.get(key) / teqCount.get(key);
-		     recallValues.get(key).add(r);
-		     //reset values
-		     teqCount.put(key, 0);
-		     teqIndex.put(key, false);
-		     teqGoodPrevisionCounter.put(key, 0);
-		     teqBadPrevisionCounter.put(key, 0);
+			//Computing partial recall
+			float r;
+			if(teqCount.get(key)==0)	r=-1;	//Null value for Recall due to no occurences of the teQuery in the interval.
+			else	r = (float) teqGoodPrevisionCounter.get(key) / teqCount.get(key);
+			recallValues.get(key).add(r);
+			//reset values
+			teqCount.put(key, 0);
+			teqIndex.put(key, false);
+			teqGoodPrevisionCounter.put(key, 0);
+			teqBadPrevisionCounter.put(key, 0);
 		}
 	}
 	

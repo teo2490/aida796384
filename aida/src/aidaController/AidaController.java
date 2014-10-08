@@ -239,7 +239,8 @@ public class AidaController {
 							q = initiater.makeQuery();
 							view.printForecastingQueries("Query "+q+" executed! @ "+System.nanoTime());
 							count++;
-							if(count==10){
+							//IL 3 VA CAMBIATO ANCHE IN GraphDesigner, DENTRO AL FOR
+							if(count==3){
 								teqState.computePartialRecall();
 								count=0;
 							}

@@ -352,20 +352,21 @@ public class SequentialPattern {
 	public boolean isScheduled(){
 		return indexScheduled;
 	}
-	
-	/**
-	 * This method schedule the creation of indexes for this sp
-	 */
-	public void schedule(){
-		indexScheduled=true;
-	}
-	
-	/**
-	 * This method removes indexes already created for this sp
-	 */
-	public void unschedule(){
-		indexScheduled=false;
-	}
+//	
+//	/**
+//	 * This method schedule the creation of indexes for this sp
+//	 */
+//	public void schedule(){
+//		indexScheduled=true;
+//	}
+//	
+//	/**
+//	 * This method removes indexes already created for this sp
+//	 */
+//	public void unschedule(){
+//		indexScheduled=false;
+//		System.out.println("UNSCHEDULED");
+//	}
 	
 	public float getRemainingTime(){
 		float last=0;

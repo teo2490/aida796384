@@ -119,21 +119,41 @@ public class Simulator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
-        /*
-    	randomInt = randomGenerator.nextInt(seed);
-        Thread.sleep(randomInt*1000*2);
-    	if(randomInt==0)	randomInt=randomInt+1;
-    	
-        //System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
-        // Notify everybody that may be interested.
-        for (QueryListener hl : listeners){
-        	hl.someoneMadeQuery(randomInt);
-        }
+		
         
+//    	randomInt = randomGenerator.nextInt(seed);
+//        Thread.sleep(randomInt*1000*2);
+//    	if(randomInt==0)	randomInt=randomInt+1;
+//    	
+//        //System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
+//        // Notify everybody that may be interested.
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(randomInt);
+//        }
+        
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(2);
+//        }
+//        System.out.println("QUERY 2");
+//        Thread.sleep(1000*2);
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(3);
+//        }
+//        System.out.println("QUERY 3");
+//        Thread.sleep(1000*2);
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(1);
+//        }
+//        System.out.println("QUERY 1");
+//        Thread.sleep(1000*2);
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(2);
+//        }
+//        System.out.println("QUERY 2");
+//        Thread.sleep(1000*2);
         return randomInt;
-        */
-        return emittente;
+        
+        //eturn emittente;
     }
 }
 
