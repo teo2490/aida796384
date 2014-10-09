@@ -127,6 +127,7 @@ public class AidaController {
         		} else {
         			running=false;
         		}
+        		teqState.paintPrecision();
         		teqState.paintRecall();
         	}
         });
@@ -241,7 +242,9 @@ public class AidaController {
 							count++;
 							//IL 3 VA CAMBIATO ANCHE IN GraphDesigner, DENTRO AL FOR
 							if(count==3){
+								teqState.computePartialPrecision();
 								teqState.computePartialRecall();
+								teqState.resetValuesAfterPartialComputations();
 								count=0;
 							}
 						}

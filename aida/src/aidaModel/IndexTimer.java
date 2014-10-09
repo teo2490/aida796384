@@ -14,7 +14,7 @@ public class IndexTimer extends TimerTask{
 	
 	@Override
 	public void run() {
-		teqState.removeIndex(teQuery);
+		teqState.removeIndexTimeOut(teQuery);
 		System.out.println("TimerTask Exectuted! Removed index for "+teQuery);
 	}
 

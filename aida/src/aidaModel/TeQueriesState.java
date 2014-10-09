@@ -19,6 +19,8 @@ public class TeQueriesState {
 	private Map<Integer, Integer> teqGoodPrevisionCounter;
 	//teQuery execution forecasted and teQuery NOT executed
 	private Map<Integer, Integer> teqBadPrevisionCounter;
+	//teQuery execution NOT forecasted, but teQuery executed
+	private Map<Integer, Integer> teqMissedPrevisionCounter;
 	
 	private Map<Integer, ArrayList<Float>> precisionValues;
 	private Map<Integer, ArrayList<Float>> recallValues;
@@ -28,8 +30,9 @@ public class TeQueriesState {
 		super();
 		teqCount = new HashMap<Integer, Integer>(); //Denominatore Recall
 		teqIndex = new HashMap<Integer, Boolean>();
-		teqGoodPrevisionCounter = new HashMap<Integer, Integer>(); //Numeratore Precision e Numeratore Recall
+		teqGoodPrevisionCounter = new HashMap<Integer, Integer>(); //Numeratore Precision e Numeratore Recall. Parte di denominatore Precision.
 		teqBadPrevisionCounter = new HashMap<Integer, Integer>(); 
+		teqMissedPrevisionCounter = new HashMap<Integer, Integer>(); //Parte di denominatore Precision.
 		
 		precisionValues = new HashMap<Integer, ArrayList<Float>>();
 		recallValues = new HashMap<Integer, ArrayList<Float>>();
@@ -103,6 +106,7 @@ public class TeQueriesState {
 		teqIndex.put(teQuery, false);
 		teqGoodPrevisionCounter.put(teQuery, 0);
 		teqBadPrevisionCounter.put(teQuery, 0);
+		teqMissedPrevisionCounter.put(teQuery, 0);
 		
 		ArrayList<Float> r = new ArrayList<Float>();
 		recallValues.put(teQuery, r);
@@ -153,6 +157,11 @@ public class TeQueriesState {
 		System.out.println("INDEX REMOVED IN TEQUERIESSTATE CLASS!");
 	}
 	
+	public void removeIndexTimeOut(Integer teQuery){
+		teqMissedPrevisionCounter.put(teQuery, teqMissedPrevisionCounter.get(teQuery)+1);
+		removeIndex(teQuery);
+	}
+	
 	/**
 	 * This method increments the count of appearence of the teQuery.
 	 * @param teQuery
@@ -163,6 +172,18 @@ public class TeQueriesState {
 		if(teqIndex.get(teQuery)==true)	teqGoodPrevisionCounter.put(teQuery, teqGoodPrevisionCounter.get(teQuery)+1);
 	}
 	
+	public void computePartialPrecision(){
+		Set<Integer> keySet = teqCount.keySet();
+		for(Integer key:keySet){
+			//Computing partial precision
+			float r;
+			int denominator = teqGoodPrevisionCounter.get(key)+teqMissedPrevisionCounter.get(key);
+			if(denominator==0)	r=-1;	//Null value for Recall due to no occurences of the teQuery in the interval.
+			else	r = (float) teqGoodPrevisionCounter.get(key) / denominator;
+			precisionValues.get(key).add(r);
+		}
+	}
+	
 	public void computePartialRecall(){
 		Set<Integer> keySet = teqCount.keySet();
 		for(Integer key:keySet){
@@ -171,11 +192,18 @@ public class TeQueriesState {
 			if(teqCount.get(key)==0)	r=-1;	//Null value for Recall due to no occurences of the teQuery in the interval.
 			else	r = (float) teqGoodPrevisionCounter.get(key) / teqCount.get(key);
 			recallValues.get(key).add(r);
+		}
+	}
+	
+	public void resetValuesAfterPartialComputations(){
+		Set<Integer> keySet = teqCount.keySet();
+		for(Integer key:keySet){
 			//reset values
 			teqCount.put(key, 0);
 			teqIndex.put(key, false);
 			teqGoodPrevisionCounter.put(key, 0);
 			teqBadPrevisionCounter.put(key, 0);
+			teqMissedPrevisionCounter.put(key, 0);
 		}
 	}
 	

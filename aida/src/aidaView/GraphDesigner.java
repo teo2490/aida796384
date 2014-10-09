@@ -61,23 +61,6 @@ public class GraphDesigner {
 		}
 		
 	}
-	/*
-	public static void main(String[] args) {
-		// Create a simple XY chart
-		XYSeries series = new XYSeries("Precision");
-		series.add(1, 1);
-		series.add(1, 2);
-		series.add(2, 1);
-		series.add(3, 9);
-		series.add(4, 10);
-		// Add the series to your data set
-		XYSeriesCollection dataset = new XYSeriesCollection();
-		dataset.addSeries(series);
-		
-		paintPrecisionGrahp(dataset);
-		paintRecallGrahp(dataset);
-	}
-	*/
 
 	public static void paintPrecisionGrahp(XYSeriesCollection dataset){
 		// Generate the graph
@@ -88,7 +71,7 @@ public class GraphDesigner {
 			"precision", // y-axis Label
 			dataset, // Dataset
 			PlotOrientation.VERTICAL, // Plot Orientation
-			false, // Show Legend
+			true, // Show Legend
 			true, // Use tooltips
 			false // Configure chart to generate URLs?
 			);
