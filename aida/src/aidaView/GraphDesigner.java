@@ -37,7 +37,7 @@ public class GraphDesigner {
 				// Create a simple XY chart
 				XYSeries series = new XYSeries("Precision q"+key);
 				for(int i=0; i<v.get(key).size(); i++){
-					series.add(i*3, v.get(key).get(i));
+					series.add(i*5, v.get(key).get(i));
 				}
 				//Insert series in dataset
 				
@@ -51,7 +51,7 @@ public class GraphDesigner {
 					// Create a simple XY chart
 					XYSeries series = new XYSeries("Recall q"+key);
 					for(int i=0; i<v.get(key).size(); i++){
-						series.add(i*3, v.get(key).get(i));
+						series.add(i*5, v.get(key).get(i));
 					}
 					//Insert series in dataset
 					

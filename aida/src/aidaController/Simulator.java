@@ -137,14 +137,24 @@ public class Simulator {
 //        System.out.println("QUERY 2");
 //        Thread.sleep(1000*2);
 //        for (QueryListener hl : listeners){
-//        	hl.someoneMadeQuery(3);
+//        	hl.someoneMadeQuery(2);
 //        }
 //        System.out.println("QUERY 3");
 //        Thread.sleep(1000*2);
 //        for (QueryListener hl : listeners){
-//        	hl.someoneMadeQuery(1);
+//        	hl.someoneMadeQuery(3);
 //        }
 //        System.out.println("QUERY 1");
+//        Thread.sleep(1000*2);
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(1);
+//        }
+//        System.out.println("QUERY 2");
+//        Thread.sleep(1000*2);
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(2);
+//        }
+//        System.out.println("QUERY 2");
 //        Thread.sleep(1000*2);
 //        for (QueryListener hl : listeners){
 //        	hl.someoneMadeQuery(2);

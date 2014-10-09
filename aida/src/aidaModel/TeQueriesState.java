@@ -209,7 +209,7 @@ public class TeQueriesState {
 	
 	public void paintPrecision(){
 		@SuppressWarnings("unused")
-		GraphDesigner d = new GraphDesigner(recallValues, 0);
+		GraphDesigner d = new GraphDesigner(precisionValues, 0);
 	}
 	
 	public void paintRecall(){
