@@ -122,7 +122,7 @@ public class Listener implements QueryListener  {
 		        				view.validateSpInList(spOnGoing.get(spOnGoing.size()-1));
 		        				
 		        				//sp.get(pos).schedule();
-		        				teqState.createIndex(sp.get(pos).getTeQuery());
+		        				teqState.createIndex(sp.get(pos).getTeQuery(), sp.get(pos).getIndexActiveTime());
 		        				//spOnGoing.get(spOnGoing.size()-1).schedule();
 		        			//}
 		        		} else {
@@ -166,7 +166,7 @@ public class Listener implements QueryListener  {
         				view.validateSpInList(spOnGoing.get(spOnGoing.size()-1)); 
         				
         				//sp.get(pos).schedule();
-        				teqState.createIndex(sp.get(pos).getTeQuery());
+        				teqState.createIndex(sp.get(pos).getTeQuery(), sp.get(pos).getIndexActiveTime());
         			} 
         		} else {
     				view.addSpToList(sp.get(i));

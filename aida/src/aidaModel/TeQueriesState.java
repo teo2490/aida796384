@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
 
 import aidaView.GraphDesigner;
 
@@ -21,6 +22,7 @@ public class TeQueriesState {
 	
 	private Map<Integer, ArrayList<Float>> precisionValues;
 	private Map<Integer, ArrayList<Float>> recallValues;
+	private Map<Integer, Timer> timerList;
 	
 	public TeQueriesState() {
 		super();
@@ -31,6 +33,7 @@ public class TeQueriesState {
 		
 		precisionValues = new HashMap<Integer, ArrayList<Float>>();
 		recallValues = new HashMap<Integer, ArrayList<Float>>();
+		timerList = new HashMap<Integer, Timer>();
 	}
 
 	/**
@@ -106,6 +109,8 @@ public class TeQueriesState {
 		
 		ArrayList<Float> p = new ArrayList<Float>();
 		precisionValues.put(teQuery, p);
+		
+		timerList.put(teQuery, null);
 	}
 	
 	/**
@@ -121,8 +126,18 @@ public class TeQueriesState {
 	 * This method sets the index for the teQuery.
 	 * @param teQuery
 	 */
-	public void createIndex(Integer teQuery){
+	public void createIndex(Integer teQuery, long time){
 		teqIndex.put(teQuery, true);
+		
+		IndexTimer task = new IndexTimer(this, teQuery);
+		Timer t = new Timer(true);
+		t.schedule(task, time);
+		
+		if(timerList.get(teQuery)!=null)	timerList.get(teQuery).cancel();
+
+		timerList.put(teQuery, t);
+		
+		System.out.println("INDEX CREATED IN TEQUERIESSTATE CLASS!");
 	}
 	
 	/**
@@ -131,6 +146,11 @@ public class TeQueriesState {
 	 */
 	public void removeIndex(Integer teQuery){
 		teqIndex.put(teQuery, false);
+		
+		timerList.get(teQuery).cancel();
+		timerList.put(teQuery, null);
+		
+		System.out.println("INDEX REMOVED IN TEQUERIESSTATE CLASS!");
 	}
 	
 	/**
@@ -159,8 +179,13 @@ public class TeQueriesState {
 		}
 	}
 	
+	public void paintPrecision(){
+		@SuppressWarnings("unused")
+		GraphDesigner d = new GraphDesigner(recallValues, 0);
+	}
+	
 	public void paintRecall(){
 		@SuppressWarnings("unused")
-		GraphDesigner d = new GraphDesigner(recallValues);
+		GraphDesigner d = new GraphDesigner(recallValues, 1);
 	}
 }

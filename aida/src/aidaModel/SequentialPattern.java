@@ -377,6 +377,16 @@ public class SequentialPattern {
 		return last;
 	}
 	
+	public long getIndexActiveTime(){
+		float last=0;
+		
+		for(int i=nextNodeToCheck-1; i<getNumberOfEdges(); i++){
+			last=last+edge.get(i).getDuration();
+			last=last+edge.get(i).getVariance();
+		}
+		return (long) last;
+	}
+	
 	/**
 	 * This method is used to validate the state of a sequential pattern. 
 	 * A valid state has two conditions:

@@ -26,22 +26,40 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 public class GraphDesigner {
 	
-	public GraphDesigner(Map<Integer, ArrayList<Float>> v){
+	public GraphDesigner(Map<Integer, ArrayList<Float>> v, int type){
 		Set<Integer> keySet = v.keySet();
 		XYSeriesCollection dataset = new XYSeriesCollection();
 		
-		for(Integer key:keySet){
-			// Create a simple XY chart
-			XYSeries series = new XYSeries("Recall"+key);
-			for(int i=0; i<v.get(key).size(); i++){
-				series.add(i*3, v.get(key).get(i));
+		if(type==0){
+			//PRECISION CASE
+			for(Integer key:keySet){
+				// Create a simple XY chart
+				XYSeries series = new XYSeries("Precision q"+key);
+				for(int i=0; i<v.get(key).size(); i++){
+					series.add(i*3, v.get(key).get(i));
+				}
+				//Insert series in dataset
+				
+				dataset.addSeries(series);
 			}
-			//Insert series in dataset
 			
-			dataset.addSeries(series);
+			paintPrecisionGrahp(dataset);			
+		} else if(type==1){
+				//RECALL CASE
+				for(Integer key:keySet){
+					// Create a simple XY chart
+					XYSeries series = new XYSeries("Recall q"+key);
+					for(int i=0; i<v.get(key).size(); i++){
+						series.add(i*3, v.get(key).get(i));
+					}
+					//Insert series in dataset
+					
+					dataset.addSeries(series);
+				}
+				
+				paintRecallGrahp(dataset);
 		}
 		
-		paintRecallGrahp(dataset);
 	}
 	/*
 	public static void main(String[] args) {

@@ -99,7 +99,7 @@ public class Simulator {
     public int makeQuery() throws InterruptedException, InvalidSequentialPatternException {
     	
         int randomInt = -1;
-        
+        /*
         int emittente = -1;
         
         try {
@@ -120,16 +120,16 @@ public class Simulator {
 			e.printStackTrace();
 		}
 		
-        
-//    	randomInt = randomGenerator.nextInt(seed);
-//        Thread.sleep(randomInt*1000*2);
-//    	if(randomInt==0)	randomInt=randomInt+1;
-//    	
-//        //System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
-//        // Notify everybody that may be interested.
-//        for (QueryListener hl : listeners){
-//        	hl.someoneMadeQuery(randomInt);
-//        }
+        */
+    	randomInt = randomGenerator.nextInt(seed);
+        Thread.sleep(randomInt*1000*2);
+    	if(randomInt==0)	randomInt=randomInt+1;
+    	
+        //System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
+        // Notify everybody that may be interested.
+        for (QueryListener hl : listeners){
+        	hl.someoneMadeQuery(randomInt);
+        }
         
 //        for (QueryListener hl : listeners){
 //        	hl.someoneMadeQuery(2);
