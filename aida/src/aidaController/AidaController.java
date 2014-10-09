@@ -72,6 +72,7 @@ public class AidaController {
 		//This listener starts the TRAINING phase when the START button is clicked
 		view.getStartBtn().addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
+        		view.getStartBtn().setEnabled(false);
         		//Getting back parameter
         		String inLog = view.getInputLog();
         		List<String> teQueryList = view.getInputTeQuery();

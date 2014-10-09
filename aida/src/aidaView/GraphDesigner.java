@@ -2,6 +2,7 @@ package aidaView;
 
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -92,10 +93,12 @@ public class GraphDesigner {
 		    	}
 			});
 			pnlButton.add(btnAddFlight);
-			Frame frame = new Frame();
+			final Frame frame = new Frame();
+			frame.setIconImage(Toolkit.getDefaultToolkit().getImage(AidaView.class.getResource("aida_39.png")));
 			frame.addWindowListener(new WindowAdapter(){
 				  public void windowClosing(WindowEvent we){
-				  System.exit(0);
+				  //System.exit(0);
+				  frame.dispose();
 				  }
 			});
 			ChartPanel panel = new ChartPanel(chart);
@@ -108,7 +111,7 @@ public class GraphDesigner {
 	}
 
 	public static void paintRecallGrahp(XYSeriesCollection dataset){
-		// Generate the graph
+			// Generate the graph
 			final JFreeChart chart = ChartFactory.createScatterPlot(
 			//JFreeChart chart = ChartFactory.createXYLineChart(
 			"Recall Chart", // Title
@@ -137,10 +140,12 @@ public class GraphDesigner {
 		    	}
 			});
 			pnlButton.add(btnAddFlight);
-			Frame frame = new Frame();
+			final Frame frame = new Frame();
+			frame.setIconImage(Toolkit.getDefaultToolkit().getImage(AidaView.class.getResource("aida_39.png")));
 			frame.addWindowListener(new WindowAdapter(){
 				  public void windowClosing(WindowEvent we){
-					  System.exit(0);
+					  //System.exit(0);
+					  frame.dispose();
 				  }
 			});
 			ChartPanel panel = new ChartPanel(chart);

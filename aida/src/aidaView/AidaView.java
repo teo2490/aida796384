@@ -498,6 +498,7 @@ public class AidaView {
         		removed.clear();
         		spPanel.removeAll();
         		errorLabel.setText("");
+        		btnStart.setEnabled(true);
         	}
         });
         
