@@ -142,6 +142,7 @@ public class TeQueriesState {
 		timerList.put(teQuery, t);
 		
 		System.out.println("INDEX CREATED IN TEQUERIESSTATE CLASS!");
+		System.out.println(teqIndex.toString());
 	}
 	
 	/**
@@ -155,11 +156,14 @@ public class TeQueriesState {
 		timerList.put(teQuery, null);
 		
 		System.out.println("INDEX REMOVED IN TEQUERIESSTATE CLASS!");
+		System.out.println(teqIndex.toString());
 	}
 	
 	public void removeIndexTimeOut(Integer teQuery){
 		teqMissedPrevisionCounter.put(teQuery, teqMissedPrevisionCounter.get(teQuery)+1);
 		removeIndex(teQuery);
+		
+		System.out.println("MISSED: "+teqMissedPrevisionCounter.toString());
 	}
 	
 	/**
@@ -170,6 +174,9 @@ public class TeQueriesState {
 		teqCount.put(teQuery, teqCount.get(teQuery)+1);
 		
 		if(teqIndex.get(teQuery)==true)	teqGoodPrevisionCounter.put(teQuery, teqGoodPrevisionCounter.get(teQuery)+1);
+		
+		System.out.println("COUNTER: "+teqCount.toString());
+		System.out.println("GOOD: "+teqGoodPrevisionCounter.toString());
 	}
 	
 	public void computePartialPrecision(){
@@ -182,6 +189,7 @@ public class TeQueriesState {
 			else	r = (float) teqGoodPrevisionCounter.get(key) / denominator;
 			precisionValues.get(key).add(r);
 		}
+		System.out.println("PRECISON: "+precisionValues.toString());
 	}
 	
 	public void computePartialRecall(){
@@ -193,6 +201,7 @@ public class TeQueriesState {
 			else	r = (float) teqGoodPrevisionCounter.get(key) / teqCount.get(key);
 			recallValues.get(key).add(r);
 		}
+		System.out.println("RECALL: "+recallValues.toString());
 	}
 	
 	public void resetValuesAfterPartialComputations(){

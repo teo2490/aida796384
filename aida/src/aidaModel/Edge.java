@@ -34,7 +34,7 @@ public class Edge {
 	//It is the variance value of the instances of the edge
 	private float variance;
 	//It contains the values of the duration of the edges in each istances of the sequential pattern in the input log
-	private List<Long> instancesDuration;
+	private List<Double> instancesDuration;
 
 	/**
 	 * Default constructor. It sets the attributes to an invalid value.
@@ -42,7 +42,7 @@ public class Edge {
 	public Edge(){
 		duration=-1;
 		variance=-1;
-		instancesDuration = new ArrayList<Long>();
+		instancesDuration = new ArrayList<Double>();
 	}
 	
 	/* Start of the getter and setter methods */
@@ -64,7 +64,7 @@ public class Edge {
 	 * 
 	 * @param i	The measure of the instance
 	 */
-	public void addInstance(long i){
+	public void addInstance(double i){
 		instancesDuration.add(i);
 	}
 	
@@ -79,15 +79,16 @@ public class Edge {
 	 * This methods compute the mean and the variance of the set of measurements of the instances.
 	 */
 	public void computeDurationAndVariance(){
-		float middle = 0;
+		double middle = 0;
 //		float sumsq = 0;
 //		float v;
 		if(instancesDuration.size()>0){
 			//Computing duration
 			for(int i=0; i<instancesDuration.size();i++){
+					System.out.println("D: "+instancesDuration.get(i));
 					middle=middle+instancesDuration.get(i);
 				}
-			duration=middle/instancesDuration.size();
+			duration= (float) middle/instancesDuration.size();
 			//duration = middle;
 			
 			//Computing Variance
@@ -98,8 +99,8 @@ public class Edge {
 //	        v = (float) (sumsq / instancesDuration.size()) - (middle / instancesDuration.size());
 //	        variance=v;
 	        
-	        long min=(long)duration;
-	        long max=0;
+	        double min=(double)duration;
+	        double max=0;
 	        for(int j=0; j<instancesDuration.size() ; j++){
 	        	if(instancesDuration.get(j)<min)	min=instancesDuration.get(j);
 	        	//< ??
@@ -112,7 +113,7 @@ public class Edge {
 //	        if(diff1>diff2)	variance=diff1;
 //	        else	variance=diff2;
 	        
-	        variance = (max-min)/2 + 1;
+	        variance = (float) (max-min)/2 + 1;
 		}
 	}
 	

@@ -2,9 +2,12 @@ package aidaController;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import aidaModel.Manager;
 import aidaView.AidaView;
 
 import exception.InvalidSequentialPatternException;
@@ -41,15 +44,18 @@ public class Simulator {
 	int seed=0;
 	AidaView view;
 	ResultSet rs;
+	Manager m;
 	
 	/**
 	 * Constructor with parameter.
 	 * 
 	 * @param r	The seed for the random generator.
 	 */
-	public Simulator(int r, AidaView v){
+	public Simulator(int r, AidaView v, Manager mp){
 		seed=r;
 		view=v;
+		m=mp;
+		System.out.println("ASSO MAP: "+m.getAssociationMap().toString());
 	}
 
 	/**
@@ -70,7 +76,7 @@ public class Simulator {
         Statement stmt = null;
         rs = null;
 
-        String query ="SELECT emittente FROM auditel.individuals_syntonizations_live WHERE user=5";
+        String query ="SELECT emittente, startTime, endTime FROM auditel.individuals_syntonizations_live WHERE user=5 ORDER BY startTime;";
         
         try {
             //getting database connection to MySQL server
@@ -89,6 +95,18 @@ public class Simulator {
            //close connection ,stmt and resultset here
         }
     }
+    
+	/**
+	 * Get a diff between two dates
+	 * @param date1 the oldest date
+	 * @param date2 the newest date
+	 * @param timeUnit the unit in which you want the diff
+	 * @return the diff value, in the provided unit
+	 */
+	public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+	    long diffInMillies = date2.getTime() - date1.getTime();
+	    return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+	}
 
     /**
      * This method generates random queries with random interval between two of them.
@@ -98,16 +116,25 @@ public class Simulator {
      */
     public int makeQuery() throws InterruptedException, InvalidSequentialPatternException {
     	
-        int randomInt = -1;
-        /*
+        //int randomInt = -1;
+        
         int emittente = -1;
+        int em = -1;
         
         try {
 	        if(rs.next()){
-		        emittente = rs.getInt(1);
+		        em = rs.getInt(1);
+		        System.out.println("EM: "+em);
+		        try{
+		        	emittente = m.getAssociationMap().get(Integer.toString(em));
+		        } catch(NullPointerException e){
+		        	emittente = -1;
+		        }
 		         
-		        randomInt = randomGenerator.nextInt(seed);
-		        Thread.sleep(randomInt*1000*2);
+		        //randomInt = randomGenerator.nextInt(seed);
+		        long time = getDateDiff(rs.getDate(2), rs.getDate(3), TimeUnit.MILLISECONDS);
+		        time = time / 1000;
+		        Thread.sleep(time);
 		         
 		        // Notify everybody that may be interested.
 		        for (QueryListener hl : listeners){
@@ -120,50 +147,64 @@ public class Simulator {
 			e.printStackTrace();
 		}
 		
-        */
-    	randomInt = randomGenerator.nextInt(seed);
-        Thread.sleep(randomInt*1000*2);
-    	if(randomInt==0)	randomInt=randomInt+1;
-    	
-        //System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
-        // Notify everybody that may be interested.
-        for (QueryListener hl : listeners){
-        	hl.someoneMadeQuery(randomInt);
-        }
         
+//    	randomInt = randomGenerator.nextInt(seed);
+//        Thread.sleep(randomInt*1000*2);
+//    	if(randomInt==0)	randomInt=randomInt+1;
+//   	
+//        //System.out.println("Query "+randomInt+" executed! @ "+System.nanoTime());
+//        // Notify everybody that may be interested.
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(randomInt);
+//        }
+        
+// ------------------        
+     
 //        for (QueryListener hl : listeners){
 //        	hl.someoneMadeQuery(2);
 //        }
-//        System.out.println("QUERY 2");
+//        System.out.println("QUERY 5");
 //        Thread.sleep(1000*2);
 //        for (QueryListener hl : listeners){
-//        	hl.someoneMadeQuery(2);
+//        	hl.someoneMadeQuery(5);
 //        }
-//        System.out.println("QUERY 3");
-//        Thread.sleep(1000*2);
-//        for (QueryListener hl : listeners){
-//        	hl.someoneMadeQuery(3);
-//        }
-//        System.out.println("QUERY 1");
+//        System.out.println("QUERY 5");
 //        Thread.sleep(1000*2);
 //        for (QueryListener hl : listeners){
 //        	hl.someoneMadeQuery(1);
 //        }
-//        System.out.println("QUERY 2");
+//        System.out.println("QUERY 1");
 //        Thread.sleep(1000*2);
 //        for (QueryListener hl : listeners){
-//        	hl.someoneMadeQuery(2);
+//        	hl.someoneMadeQuery(5);
 //        }
-//        System.out.println("QUERY 2");
+//        System.out.println("QUERY 5");
 //        Thread.sleep(1000*2);
 //        for (QueryListener hl : listeners){
-//        	hl.someoneMadeQuery(2);
+//        	hl.someoneMadeQuery(5);
 //        }
-//        System.out.println("QUERY 2");
+//        System.out.println("QUERY 5");
 //        Thread.sleep(1000*2);
-        return randomInt;
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(5);
+//        }
+//        System.out.println("QUERY 5");
+//        Thread.sleep(1000*2);
+//       
+//        Thread.sleep(1000*2);
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(5);
+//        }
+//        System.out.println("QUERY 5");
+//        Thread.sleep(1000*2);
+//        for (QueryListener hl : listeners){
+//        	hl.someoneMadeQuery(1);
+//        }
+//        System.out.println("QUERY 1");
+//        Thread.sleep(1000*2);
+//        return randomInt;
         
-        //eturn emittente;
+        return emittente;
     }
 }
 

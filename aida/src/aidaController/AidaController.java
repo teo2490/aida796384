@@ -59,6 +59,10 @@ public class AidaController {
 	
 	private TeQueriesState teqState;
 	
+	private Manager md;
+	
+	static final int CYCLE_SIZE = 10;
+	
 	public AidaController(AidaView v){
 		this.view = v;
 		this.running=false;
@@ -143,7 +147,7 @@ public class AidaController {
 	public void training(String inLog, String teQuery, Double inSup, int count) throws Exception{
 		qpos = view.getInputQueryPos();
 		tpos = view.getInputTimestampPos();
-		Manager md = new Manager(qpos, tpos);
+		md = new Manager(qpos, tpos);
 		//Parsing the CSV input 
 		md.parseCSVtoTXT(inLog,
 				"C:\\Users\\Matteo\\Dropbox\\UNI\\TESI RELACS\\MatteoSimoni\\java_prove\\csv\\inputPrefixSpan_"+count+".txt",
@@ -217,7 +221,7 @@ public class AidaController {
 //		}
 //		//Used in place of the for-block for ad-hoc testin purposes
 //		initiater.makeQuery();
-		final Simulator initiater = new Simulator(5, view);
+		final Simulator initiater = new Simulator(5, view, md);
 		
 		for(int i=0; i<sp.size(); i++){
 			Listener r1 = new Listener(sp.get(i), inTime.get(i), view, teqState);
@@ -236,13 +240,13 @@ public class AidaController {
 
 				while(running){
 					try {
-						Thread.sleep(1000);
+						//Thread.sleep(1000);
 						if(running){
 							q = initiater.makeQuery();
 							view.printForecastingQueries("Query "+q+" executed! @ "+System.nanoTime());
 							count++;
-							//IL 5 VA CAMBIATO ANCHE IN GraphDesigner, DENTRO AL FOR
-							if(count==5){
+							//IL 10 VA CAMBIATO ANCHE IN GraphDesigner, DENTRO AL FOR
+							if(count==CYCLE_SIZE){
 								teqState.computePartialPrecision();
 								teqState.computePartialRecall();
 								teqState.resetValuesAfterPartialComputations();

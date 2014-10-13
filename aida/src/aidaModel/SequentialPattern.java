@@ -3,6 +3,7 @@ package aidaModel;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import exception.InvalidSequentialPatternException;
 
@@ -201,7 +202,7 @@ public class SequentialPattern {
 		int t=0;
 		Date start=null;
 		Date end=null;
-		long diff;
+		double diff;
 		
 		while(t<ql.size()-1){
 			if(ql.get(t)==node.get(k)){
@@ -209,8 +210,8 @@ public class SequentialPattern {
 				for(i=t+1;i<ql.size();i++){
 					if(ql.get(i)==node.get(k+1) && partialSpIsPresentBackward(ql, k, t) && partialSpIsPresentForward(ql, k+1, i)){
 						end = tl.get(i);
-						diff=end.getTime()-start.getTime();
-						//diff=diff/1000;	//Convert in seconds
+						diff=getDateDiff(start, end, TimeUnit.MILLISECONDS);
+						diff=diff/1000;	//Convert in seconds
 						edge.get(k).addInstance(diff);
 					}
 				}
@@ -219,6 +220,18 @@ public class SequentialPattern {
 			}
 			t++;
 		}
+	}
+	
+	/**
+	 * Get a diff between two dates
+	 * @param date1 the oldest date
+	 * @param date2 the newest date
+	 * @param timeUnit the unit in which you want the diff
+	 * @return the diff value, in the provided unit
+	 */
+	public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+	    long diffInMillies = date2.getTime() - date1.getTime();
+	    return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
 	}
 	
 	/**

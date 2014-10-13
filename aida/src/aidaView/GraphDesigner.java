@@ -27,6 +27,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 public class GraphDesigner {
 	
+	static final int CYCLE_SIZE = 10;
+	
 	public GraphDesigner(Map<Integer, ArrayList<Float>> v, int type){
 		Set<Integer> keySet = v.keySet();
 		XYSeriesCollection dataset = new XYSeriesCollection();
@@ -37,7 +39,7 @@ public class GraphDesigner {
 				// Create a simple XY chart
 				XYSeries series = new XYSeries("Precision q"+key);
 				for(int i=0; i<v.get(key).size(); i++){
-					series.add(i*5, v.get(key).get(i));
+					series.add(i*CYCLE_SIZE, v.get(key).get(i));
 				}
 				//Insert series in dataset
 				
@@ -51,7 +53,7 @@ public class GraphDesigner {
 					// Create a simple XY chart
 					XYSeries series = new XYSeries("Recall q"+key);
 					for(int i=0; i<v.get(key).size(); i++){
-						series.add(i*5, v.get(key).get(i));
+						series.add(i*CYCLE_SIZE, v.get(key).get(i));
 					}
 					//Insert series in dataset
 					

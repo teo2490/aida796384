@@ -75,9 +75,10 @@ public class Listener implements QueryListener  {
 		System.out.println("Someone MADES a QUERY an spOnGoing size is: "+spOnGoing.size());
 		
 		//Check if the flowing query is the teQuery
-		if(q==sp.get(0).getTeQuery()){
+		if(sp.size()>0 && q==sp.get(0).getTeQuery()){
 			//Increment occurences number
 			teqState.incrementAppearanceNumber(q);
+		
 			//If the teQuery is executed and index is set, then the index is removed.
 			if(teqState.indexIsSet(q)){
 				teqState.removeIndex(q);	
@@ -107,6 +108,11 @@ public class Listener implements QueryListener  {
 		        		//newSP.incrementNextNodeToCheck(); 
 		        		//newSP.setLastCheck(time);
 		        		spOnGoing.add(newSP);
+		        		
+		        		//141013 - AGGIUNTO PER EVITARE EXCEPTION
+		        		view.addSpToList(newSP);
+		        		//
+		        		
 		        		//System.out.println(newSP.toString()+" ADDED");
 		        		//If the remaining time of a sp (the sum of its remaining edges duration without considering the
 		        		//next edge to check) is lower than the time needed for index creation, it is removed from the list
@@ -144,7 +150,7 @@ public class Listener implements QueryListener  {
 		        			//}
 		        		}
 		        	}
-	        	} else System.out.println(currentSp.toString()+" NO");
+	        	} //else System.out.println(currentSp.toString()+" NO");
 	        }
         }
         
@@ -153,6 +159,11 @@ public class Listener implements QueryListener  {
         	if(sp.get(i).getNode(0) == q && sp.get(i).isScheduled()==false){
         		//Updated both the sp list of the controller and the sp list of the view
         		spOnGoing.add(sp.get(i));
+        		
+        		//141013 - AGGIUNTO PER EVITARE EXCEPTION
+        		view.addSpToList(sp.get(i));
+        		//
+        		
         		//System.out.println("SIZE: "+spOnGoing.size());
         		spOnGoing.get(spOnGoing.size()-1).setLastCheck(time);
         		//If yhe time needed to implement indexes is less then the remaining time of the sp, 
@@ -212,8 +223,8 @@ public class Listener implements QueryListener  {
 	 */
 	public boolean checkValidity(SequentialPattern s, long t){
 		long diff=t-s.getLastCheck();
-		System.out.println("VALIDITY: "+(s.getNextNodeToCheck()>=s.getNumberOfNodes()));
-		System.out.println("NEXT: "+s.getNextNodeToCheck());
+		//System.out.println("VALIDITY: "+(s.getNextNodeToCheck()>=s.getNumberOfNodes()));
+		//System.out.println("NEXT: "+s.getNextNodeToCheck());
 		if(s.getNextNodeToCheck()>=s.getNumberOfNodes())	return false;
 		if(s.getLastCheck()==0)	return true;	//If it is the first node of a sp, return true
 		else if(diff<s.getDuration(s.getNextNodeToCheck()-1)+s.getVariance(s.getNextNodeToCheck()-1))	return true;
